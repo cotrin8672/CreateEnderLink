@@ -2,6 +2,7 @@ package io.github.cotrin8672.cel
 
 import com.simibubi.create.foundation.data.CreateRegistrate
 import io.github.cotrin8672.cel.datagen.CelDatagen
+import io.github.cotrin8672.cel.registry.CelBlockEntityTypes
 import io.github.cotrin8672.cel.registry.CelBlocks
 import net.minecraft.resources.ResourceLocation
 import net.neoforged.bus.api.EventPriority
@@ -24,6 +25,7 @@ class CreateEnderLink(container: ModContainer) {
     init {
         REGISTRATE.registerEventListeners(MOD_BUS)
         CelBlocks.register()
+        CelBlockEntityTypes.register()
         MOD_BUS.addListener(EventPriority.LOWEST, CelDatagen::gatherData)
     }
 }

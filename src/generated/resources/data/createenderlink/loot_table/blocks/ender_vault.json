@@ -11,11 +11,11 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "createenderlink:smart_ender_vault"
+          "name": "createenderlink:ender_vault"
         }
       ],
       "rolls": 1.0
     }
   ],
-  "random_sequence": "createenderlink:blocks/smart_ender_vault"
+  "random_sequence": "createenderlink:blocks/ender_vault"
 }

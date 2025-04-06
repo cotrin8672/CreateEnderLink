@@ -2,11 +2,11 @@
   "credit": "Made with Blockbench",
   "parent": "block/block",
   "textures": {
-    "0": "createenderlink:block/smart_ender_vault/smart_ender_chest_bottom",
-    "1": "createenderlink:block/smart_ender_vault/smart_ender_chest_front",
-    "2": "createenderlink:block/smart_ender_vault/smart_ender_chest_side",
-    "3": "createenderlink:block/smart_ender_vault/smart_ender_chest_top",
-    "particle": "createenderlink:block/smart_ender_vault/smart_ender_chest_bottom"
+    "0": "createenderlink:block/ender_vault/ender_vault_bottom",
+    "1": "createenderlink:block/ender_vault/ender_vault_front",
+    "2": "createenderlink:block/ender_vault/ender_vault_side",
+    "3": "createenderlink:block/ender_vault/ender_vault_top",
+    "particle": "createenderlink:block/ender_vault/ender_vault_bottom"
   },
   "elements": [
     {
