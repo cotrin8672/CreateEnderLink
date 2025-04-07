@@ -1,8 +1,8 @@
 package io.github.cotrin8672.cel.datagen
 
 import com.tterrag.registrate.providers.RegistrateDataProvider
-import io.github.cotrin8672.cel.CreateEnderLink.Companion.MOD_ID
-import io.github.cotrin8672.cel.CreateEnderLink.Companion.REGISTRATE
+import io.github.cotrin8672.cel.CreateEnderLink.MOD_ID
+import io.github.cotrin8672.cel.CreateEnderLink.REGISTRATE
 import net.neoforged.neoforge.data.event.GatherDataEvent
 
 object CelDatagen {

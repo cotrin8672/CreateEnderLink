@@ -5,7 +5,7 @@ import com.simibubi.create.foundation.data.BlockStateGen
 import com.simibubi.create.foundation.data.SharedProperties
 import com.simibubi.create.foundation.data.TagGen.pickaxeOnly
 import com.tterrag.registrate.util.entry.BlockEntry
-import io.github.cotrin8672.cel.CreateEnderLink.Companion.REGISTRATE
+import io.github.cotrin8672.cel.CreateEnderLink.REGISTRATE
 import io.github.cotrin8672.cel.block.EnderVaultBlock
 import net.minecraft.world.level.block.SoundType
 import net.minecraft.world.level.material.MapColor
@@ -15,7 +15,7 @@ object CelBlocks {
         REGISTRATE.setCreativeTab(AllCreativeModeTabs.BASE_CREATIVE_TAB)
     }
 
-    val ENDER_CHEST: BlockEntry<EnderVaultBlock> = REGISTRATE
+    val ENDER_VAULT: BlockEntry<EnderVaultBlock> = REGISTRATE
         .block<EnderVaultBlock>("ender_vault", ::EnderVaultBlock)
         .initialProperties(SharedProperties::softMetal)
         .properties {

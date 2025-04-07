@@ -7,7 +7,6 @@ import com.simibubi.create.CreateClient
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBox.ItemValueBox
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxRenderer
-import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform.Sided
 import io.github.cotrin8672.cel.block.SharedStorageBehaviour
 import net.createmod.catnip.data.Iterate
@@ -41,11 +40,11 @@ object FrequencyRenderer {
         for (behaviour in blockEntity.allBehaviours) {
             if (behaviour !is SharedStorageBehaviour) continue
 
-            if (behaviour.slotPositioning is ValueBoxTransform.Sided)
-                (behaviour.slotPositioning as ValueBoxTransform.Sided).fromSide(target.direction)
+            if (behaviour.slotPositioning is Sided)
+                (behaviour.slotPositioning as Sided).fromSide(target.direction)
             if (!behaviour.slotPositioning.shouldRender(level, pos, state)) continue
 
-            val frequencyItem = behaviour.getFrequencyItem()
+            val frequencyItem = behaviour.getFrequencyItem().stack
             val hit = behaviour.slotPositioning.testHit(
                 level,
                 pos,
@@ -105,7 +104,7 @@ object FrequencyRenderer {
             }
 
             if (!behaviour.isActive) continue
-            if (behaviour.getFrequencyItem().isEmpty) continue
+            if (behaviour.getFrequencyItem().stack.isEmpty) continue
 
             val slotPositioning = behaviour.slotPositioning
             val blockState = be.blockState
@@ -114,7 +113,7 @@ object FrequencyRenderer {
                 val side = slotPositioning.side
                 for (direction in Iterate.directions) {
                     val frequency = behaviour.getFrequencyItem()
-                    if (frequency.isEmpty) continue
+                    if (frequency.stack.isEmpty) continue
 
                     slotPositioning.fromSide(direction)
                     if (!slotPositioning.shouldRender(level, blockPos, blockState)) continue
@@ -122,9 +121,9 @@ object FrequencyRenderer {
                     ms.use {
                         slotPositioning.transform(level, blockPos, blockState, ms)
                         if (AllBlocks.CONTRAPTION_CONTROLS.has(blockState))
-                            ValueBoxRenderer.renderFlatItemIntoValueBox(frequency, ms, buffer, light, overlay)
+                            ValueBoxRenderer.renderFlatItemIntoValueBox(frequency.stack, ms, buffer, light, overlay)
                         else
-                            ValueBoxRenderer.renderItemIntoValueBox(frequency, ms, buffer, light, overlay)
+                            ValueBoxRenderer.renderItemIntoValueBox(frequency.stack, ms, buffer, light, overlay)
                     }
                 }
                 slotPositioning.fromSide(side)
@@ -132,7 +131,13 @@ object FrequencyRenderer {
             } else if (slotPositioning.shouldRender(level, blockPos, blockState)) {
                 ms.use {
                     slotPositioning.transform(level, blockPos, blockState, ms)
-                    ValueBoxRenderer.renderItemIntoValueBox(behaviour.getFrequencyItem(), ms, buffer, light, overlay)
+                    ValueBoxRenderer.renderItemIntoValueBox(
+                        behaviour.getFrequencyItem().stack,
+                        ms,
+                        buffer,
+                        light,
+                        overlay
+                    )
                 }
             }
         }

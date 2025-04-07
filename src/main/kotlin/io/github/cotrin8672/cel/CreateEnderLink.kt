@@ -1,25 +1,27 @@
 package io.github.cotrin8672.cel
 
 import com.simibubi.create.foundation.data.CreateRegistrate
+import io.github.cotrin8672.cel.block.EnderVaultBlockEntity
 import io.github.cotrin8672.cel.datagen.CelDatagen
 import io.github.cotrin8672.cel.registry.CelBlockEntityTypes
 import io.github.cotrin8672.cel.registry.CelBlocks
 import net.minecraft.resources.ResourceLocation
 import net.neoforged.bus.api.EventPriority
-import net.neoforged.fml.ModContainer
+import net.neoforged.bus.api.SubscribeEvent
+import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.fml.common.Mod
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent
 import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
 
+@EventBusSubscriber(modid = CreateEnderLink.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 @Mod(CreateEnderLink.MOD_ID)
-class CreateEnderLink(container: ModContainer) {
-    companion object {
-        const val MOD_ID = "createenderlink"
+object CreateEnderLink {
+    const val MOD_ID = "createenderlink"
 
-        val REGISTRATE: CreateRegistrate = CreateRegistrate.create(MOD_ID)
+    val REGISTRATE: CreateRegistrate = CreateRegistrate.create(MOD_ID)
 
-        fun asResource(path: String): ResourceLocation {
-            return ResourceLocation.fromNamespaceAndPath(MOD_ID, path)
-        }
+    fun asResource(path: String): ResourceLocation {
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path)
     }
 
     init {
@@ -27,5 +29,10 @@ class CreateEnderLink(container: ModContainer) {
         CelBlocks.register()
         CelBlockEntityTypes.register()
         MOD_BUS.addListener(EventPriority.LOWEST, CelDatagen::gatherData)
+    }
+
+    @SubscribeEvent
+    fun registerCapabilities(event: RegisterCapabilitiesEvent) {
+        EnderVaultBlockEntity.registerCapabilities(event)
     }
 }

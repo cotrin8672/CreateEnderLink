@@ -41,7 +41,7 @@ open class SharedStorageBehaviour(
     }
 
     override fun write(nbt: CompoundTag, registries: HolderLookup.Provider, clientPacket: Boolean) {
-        nbt.put("Frequency", getFrequencyItem().saveOptional(registries))
+        nbt.put("Frequency", getFrequencyItem().stack.saveOptional(registries))
 
         super.write(nbt, registries, clientPacket)
     }
@@ -65,11 +65,12 @@ open class SharedStorageBehaviour(
         return slotPositioning
     }
 
-    fun getFrequencyItem(): ItemStack = frequencyItem.stack
+    fun getFrequencyItem(): Frequency = frequencyItem
 
     override fun createBoard(player: Player?, hitResult: BlockHitResult?): ValueSettingsBoard {
-        val filter: ItemStack = getFrequencyItem()
-        val maxAmount = if (filter.item is FilterItem) 64 else filter.getOrDefault(DataComponents.MAX_STACK_SIZE, 64)
+        val frequency: ItemStack = getFrequencyItem().stack
+        val maxAmount =
+            if (frequency.item is FilterItem) 64 else frequency.getOrDefault(DataComponents.MAX_STACK_SIZE, 64)
         return ValueSettingsBoard(
             CreateLang.translateDirect("logistics.filter.extracted_amount"),
             maxAmount,
@@ -80,7 +81,11 @@ open class SharedStorageBehaviour(
     }
 
     private fun formatValue(value: ValueSettings): MutableComponent? {
-        if (value.row() == 0 && value.value() == getFrequencyItem().getOrDefault(DataComponents.MAX_STACK_SIZE, 64))
+        if (value.row() == 0 && value.value() == getFrequencyItem().stack.getOrDefault(
+                DataComponents.MAX_STACK_SIZE,
+                64
+            )
+        )
             return CreateLang.translateDirect("logistics.filter.any_amount_short")
         return Component.literal((if (value.row() == 0) "\u2264" else "=") + max(1.0, value.value().toDouble()))
     }

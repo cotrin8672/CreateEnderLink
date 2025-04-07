@@ -44,4 +44,6 @@ class EnderVaultBlock(properties: Properties) : Block(properties), IWrenchable, 
     override fun getStateForPlacement(context: BlockPlaceContext): BlockState {
         return defaultBlockState().setValue(HORIZONTAL_AXIS, context.horizontalDirection.axis)
     }
+
+    
 }
