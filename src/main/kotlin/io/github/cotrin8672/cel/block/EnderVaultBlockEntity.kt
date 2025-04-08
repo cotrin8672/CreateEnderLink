@@ -6,6 +6,7 @@ import com.simibubi.create.foundation.blockEntity.behaviour.CenteredSideValueBox
 import io.github.cotrin8672.cel.registry.CelBlockEntityTypes
 import io.github.cotrin8672.cel.util.SharedStorageHandler
 import net.minecraft.core.BlockPos
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
@@ -31,7 +32,10 @@ class EnderVaultBlockEntity(
 
     fun getInventory(): IItemHandler? {
         val behaviour = getBehaviour(SharedStorageBehaviour.TYPE) ?: return null
-        return SharedStorageHandler.getOrCreateInventory(level!!, behaviour.getFrequencyItem())
+        val nonNullLevel = level ?: return null
+        if (nonNullLevel is ServerLevel)
+            return SharedStorageHandler.instance?.getOrCreateInventory(behaviour.getFrequencyItem())
+        return null
     }
 
     override fun addBehaviours(behaviours: MutableList<BlockEntityBehaviour>) {
