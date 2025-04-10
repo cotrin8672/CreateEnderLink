@@ -8,9 +8,12 @@ import net.neoforged.neoforge.data.event.GatherDataEvent
 object CelDatagen {
     @JvmStatic
     fun gatherData(event: GatherDataEvent) {
-        event.generator.addProvider(
+        val generator = event.generator
+        val packOutput = generator.packOutput
+        generator.addProvider(
             true,
             REGISTRATE.setDataProvider(RegistrateDataProvider(REGISTRATE, MOD_ID, event))
         )
+        generator.addProvider(true, CelRecipeProvider(packOutput, event.lookupProvider))
     }
 }

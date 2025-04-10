@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "create:brass_sheet"
+    },
+    "E": {
+      "item": "minecraft:ender_eye"
+    },
+    "V": {
+      "item": "create:item_vault"
+    }
+  },
+  "pattern": [
+    " B ",
+    "EVE",
+    " B "
+  ],
+  "result": {
+    "count": 1,
+    "id": "createenderlink:ender_vault"
+  }
+}
