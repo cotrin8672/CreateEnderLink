@@ -3,8 +3,6 @@ package io.github.cotrin8672.cel.block
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour
 import com.simibubi.create.foundation.blockEntity.behaviour.CenteredSideValueBoxTransform
-import com.simibubi.create.foundation.blockEntity.behaviour.inventory.CapManipulationBehaviourBase
-import com.simibubi.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour
 import io.github.cotrin8672.cel.registry.CelBlockEntityTypes
 import io.github.cotrin8672.cel.util.SharedStorageHandler
 import net.minecraft.core.BlockPos
@@ -44,11 +42,5 @@ class EnderVaultBlockEntity(
         behaviours.add(SharedStorageBehaviour(this, CenteredSideValueBoxTransform { state, direction ->
             state.getValue(BlockStateProperties.HORIZONTAL_AXIS) == direction.axis
         }))
-        behaviours.add(
-            InvManipulationBehaviour.forInsertion(
-                this,
-                CapManipulationBehaviourBase.InterfaceProvider.oppositeOfBlockFacing()
-            )
-        )
     }
 }

@@ -2,14 +2,17 @@ package io.github.cotrin8672.cel.block
 
 import com.mojang.serialization.MapCodec
 import com.simibubi.create.api.contraption.storage.item.MountedItemStorage
+import com.simibubi.create.content.contraptions.Contraption
 import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler.Frequency
 import io.github.cotrin8672.cel.registry.CelMountedStorageTypes
 import io.github.cotrin8672.cel.util.SharedStorageHandler
 import net.minecraft.core.BlockPos
+import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate
 
 class EnderVaultMountedStorage(
     private val frequencyItem: ItemStack,
@@ -53,4 +56,12 @@ class EnderVaultMountedStorage(
     }
 
     override fun unmount(level: Level?, state: BlockState?, pos: BlockPos?, be: BlockEntity?) {}
+
+    override fun handleInteraction(
+        player: ServerPlayer?,
+        contraption: Contraption?,
+        info: StructureTemplate.StructureBlockInfo?,
+    ): Boolean {
+        return false
+    }
 }
