@@ -8,6 +8,10 @@ These blocks can set frequency to share the contents,same as redstone link.
 
 ![Replace this with a description](https://cdn.modrinth.com/data/cached_images/155510fb4862fe8f8eb7cea93c209a66285cfae1.png)
 
+### Link count information
+
+![Replace this with a description](https://cdn.modrinth.com/data/cached_images/3c5d0b12c1bce797c8406db946d2126dab053565.png)
+
 ### Share the content
 Two or more blocks that have same frequency settings share the content.
 
