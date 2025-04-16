@@ -64,13 +64,9 @@ class EnderVaultBlockEntity(
     override fun addToGoggleTooltip(tooltip: MutableList<Component>, isPlayerSneaking: Boolean): Boolean {
         super.addToGoggleTooltip(tooltip, isPlayerSneaking)
 
-        val virtual = blockEntities.map {
-            it.blockPos
-        }
-        val count = blockEntities.map {
-            it.getBehaviour(SharedStorageBehaviour.TYPE).getFrequencyItem().stack.item
-        }.count {
-            getBehaviour(SharedStorageBehaviour.TYPE).getFrequencyItem().stack.item == it
+        val count = blockEntities.count {
+            getBehaviour(SharedStorageBehaviour.TYPE).getFrequencyItem().stack.item ==
+                    it.getBehaviour(SharedStorageBehaviour.TYPE).getFrequencyItem().stack.item
         }
 
         CelLang.translate("gui.goggles.storage_stat").forGoggles(tooltip)
@@ -80,6 +76,8 @@ class EnderVaultBlockEntity(
             .forGoggles(tooltip)
 
         CelLang.number(count.toDouble())
+            .space()
+            .translate(if (count > 1.0) "gui.goggles.block.plural" else "gui.goggles.block.singular")
             .style(ChatFormatting.AQUA)
             .space()
             .add(CelLang.translate("gui.goggles.at_current_loading").style(ChatFormatting.DARK_GRAY))

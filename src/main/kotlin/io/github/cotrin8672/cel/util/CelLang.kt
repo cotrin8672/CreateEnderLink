@@ -1,6 +1,5 @@
 package io.github.cotrin8672.cel.util
 
-import com.simibubi.create.foundation.utility.CreateLang
 import io.github.cotrin8672.cel.CreateEnderLink
 import net.createmod.catnip.lang.LangBuilder
 import net.createmod.catnip.lang.LangNumberFormat
@@ -15,6 +14,6 @@ object CelLang {
     }
 
     fun number(d: Double): LangBuilder {
-        return CreateLang.builder().text(LangNumberFormat.format(d))
+        return builder().text(LangNumberFormat.format(d))
     }
 }

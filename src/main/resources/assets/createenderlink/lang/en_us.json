@@ -1,5 +1,11 @@
 {
   "createenderlink.tooltip.frequency.frequency": "Frequency",
   "createenderlink.tooltip.frequency.click_to_set": "Click to set",
-  "createenderlink.tooltip.frequency.click_to_replace": "Click to replace"
+  "createenderlink.tooltip.frequency.click_to_replace": "Click to replace",
+  "block.createenderlink.ender_vault": "Ender Vault",
+  "createenderlink.gui.goggles.storage_stat": "Storage Stats:",
+  "createenderlink.gui.goggles.same_frequency_count": "Linked Block Count:",
+  "createenderlink.gui.goggles.block.singular": "Block",
+  "createenderlink.gui.goggles.block.plural": "Blocks",
+  "createenderlink.gui.goggles.at_current_loading": "currently loading"
 }
