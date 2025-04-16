@@ -1,4 +1,4 @@
-package io.github.cotrin8672.cel.block
+package io.github.cotrin8672.cel.content
 
 import com.simibubi.create.AllBlocks
 import com.simibubi.create.AllItems

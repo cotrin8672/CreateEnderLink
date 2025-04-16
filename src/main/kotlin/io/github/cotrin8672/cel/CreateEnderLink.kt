@@ -1,7 +1,7 @@
 package io.github.cotrin8672.cel
 
 import com.simibubi.create.foundation.data.CreateRegistrate
-import io.github.cotrin8672.cel.block.EnderVaultBlockEntity
+import io.github.cotrin8672.cel.content.block.vault.EnderVaultBlockEntity
 import io.github.cotrin8672.cel.datagen.CelDatagen
 import io.github.cotrin8672.cel.registry.CelBlockEntityTypes
 import io.github.cotrin8672.cel.registry.CelBlocks

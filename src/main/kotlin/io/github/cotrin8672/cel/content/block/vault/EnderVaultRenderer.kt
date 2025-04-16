@@ -1,4 +1,4 @@
-package io.github.cotrin8672.cel.block
+package io.github.cotrin8672.cel.content.block.vault
 
 import com.mojang.blaze3d.vertex.PoseStack
 import com.simibubi.create.foundation.blockEntity.renderer.SmartBlockEntityRenderer

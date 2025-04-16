@@ -1,6 +1,7 @@
 package io.github.cotrin8672.cel.util
 
 import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler.Frequency
+import io.github.cotrin8672.cel.content.storage.SharedItemStackHandler
 import net.minecraft.core.HolderLookup.Provider
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag

@@ -1,4 +1,4 @@
-package io.github.cotrin8672.cel.block
+package io.github.cotrin8672.cel.content.block.vault
 
 import com.simibubi.create.content.equipment.wrench.IWrenchable
 import com.simibubi.create.foundation.block.IBE
@@ -44,6 +44,4 @@ class EnderVaultBlock(properties: Properties) : Block(properties), IWrenchable, 
     override fun getStateForPlacement(context: BlockPlaceContext): BlockState {
         return defaultBlockState().setValue(HORIZONTAL_AXIS, context.horizontalDirection.axis)
     }
-
-    
 }

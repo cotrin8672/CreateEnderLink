@@ -1,8 +1,9 @@
-package io.github.cotrin8672.cel.block
+package io.github.cotrin8672.cel.content.block.vault
 
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour
 import com.simibubi.create.foundation.blockEntity.behaviour.CenteredSideValueBoxTransform
+import io.github.cotrin8672.cel.content.SharedStorageBehaviour
 import io.github.cotrin8672.cel.registry.CelBlockEntityTypes
 import io.github.cotrin8672.cel.util.SharedStorageHandler
 import net.minecraft.core.BlockPos
