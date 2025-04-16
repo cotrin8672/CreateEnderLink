@@ -1,7 +1,8 @@
-package io.github.cotrin8672.cel.block
+package io.github.cotrin8672.cel.content.storage
 
 import com.simibubi.create.api.contraption.storage.item.MountedItemStorageType
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity
+import io.github.cotrin8672.cel.content.SharedStorageBehaviour
 import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.level.Level

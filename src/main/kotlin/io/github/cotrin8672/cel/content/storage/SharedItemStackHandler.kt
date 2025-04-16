@@ -1,5 +1,6 @@
-package io.github.cotrin8672.cel.util
+package io.github.cotrin8672.cel.content.storage
 
+import io.github.cotrin8672.cel.util.SharedStorageHandler
 import net.minecraft.world.item.ItemStack
 import net.neoforged.neoforge.items.ItemStackHandler
 

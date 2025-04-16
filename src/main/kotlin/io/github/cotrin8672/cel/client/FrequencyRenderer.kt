@@ -8,7 +8,7 @@ import com.simibubi.create.foundation.blockEntity.SmartBlockEntity
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBox.ItemValueBox
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxRenderer
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform.Sided
-import io.github.cotrin8672.cel.block.SharedStorageBehaviour
+import io.github.cotrin8672.cel.content.SharedStorageBehaviour
 import net.createmod.catnip.data.Iterate
 import net.createmod.catnip.data.Pair
 import net.createmod.catnip.math.VecHelper

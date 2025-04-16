@@ -1,4 +1,4 @@
-package io.github.cotrin8672.cel.block
+package io.github.cotrin8672.cel.content.storage
 
 import com.mojang.serialization.MapCodec
 import com.simibubi.create.api.contraption.storage.item.MountedItemStorage
