@@ -36,20 +36,18 @@ class EnderVaultBlockEntity(
         }
 
         private val blockEntities: MutableSet<EnderVaultBlockEntity> = Collections.newSetFromMap(WeakHashMap())
-
     }
 
     init {
         val isAlreadyExists = blockEntities.map { it.blockPos }.contains(this.blockPos)
-        if (!isAlreadyExists)
-            blockEntities.add(this)
+        if (!isAlreadyExists) blockEntities.add(this)
     }
 
-    fun getInventory(): IItemHandler? {
+    private fun getInventory(): IItemHandler? {
         val behaviour = getBehaviour(SharedStorageBehaviour.TYPE) ?: return null
         val nonNullLevel = level ?: return null
         if (nonNullLevel is ServerLevel) {
-            val inventory = SharedStorageHandler.instance?.getOrCreateInventory(behaviour.getFrequencyItem())
+            val inventory = SharedStorageHandler.instance?.getOrCreateSharedItemStorage(behaviour.getFrequencyItem())
             return inventory
         }
         return null

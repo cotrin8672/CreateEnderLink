@@ -42,7 +42,6 @@ open class SharedStorageBehaviour(
 
     override fun write(nbt: CompoundTag, registries: HolderLookup.Provider, clientPacket: Boolean) {
         nbt.put("Frequency", getFrequencyItem().stack.saveOptional(registries))
-
         super.write(nbt, registries, clientPacket)
     }
 

@@ -14,17 +14,17 @@ import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate
 
-class EnderVaultMountedStorage(
+class SharedMountedItemStorage(
     private val frequencyItem: ItemStack,
 ) : MountedItemStorage(CelMountedStorageTypes.SHARED_ITEM.get()) {
     companion object {
-        val CODEC: MapCodec<EnderVaultMountedStorage> =
-            ItemStack.CODEC.xmap(::EnderVaultMountedStorage) { it.frequencyItem }.fieldOf("value")
+        val CODEC: MapCodec<SharedMountedItemStorage> =
+            ItemStack.CODEC.xmap(::SharedMountedItemStorage) { it.frequencyItem }.fieldOf("value")
     }
 
     private val frequency = Frequency.of(frequencyItem)
     private val sharedItemStackHandler by lazy {
-        SharedStorageHandler.instance!!.getOrCreateInventory(frequency)
+        SharedStorageHandler.instance!!.getOrCreateSharedItemStorage(frequency)
     }
 
     override fun getSlots(): Int {

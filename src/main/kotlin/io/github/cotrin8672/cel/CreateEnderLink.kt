@@ -1,6 +1,7 @@
 package io.github.cotrin8672.cel
 
 import com.simibubi.create.foundation.data.CreateRegistrate
+import io.github.cotrin8672.cel.content.block.tank.EnderTankBlockEntity
 import io.github.cotrin8672.cel.content.block.vault.EnderVaultBlockEntity
 import io.github.cotrin8672.cel.datagen.CelDatagen
 import io.github.cotrin8672.cel.registry.CelBlockEntityTypes
@@ -34,5 +35,6 @@ object CreateEnderLink {
     @SubscribeEvent
     fun registerCapabilities(event: RegisterCapabilitiesEvent) {
         EnderVaultBlockEntity.registerCapabilities(event)
+        EnderTankBlockEntity.registerCapability(event)
     }
 }

@@ -9,14 +9,14 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 
-class EnderVaultMountedStorageType : MountedItemStorageType<EnderVaultMountedStorage>(EnderVaultMountedStorage.CODEC) {
-    override fun mount(level: Level, state: BlockState, pos: BlockPos, be: BlockEntity?): EnderVaultMountedStorage? {
+class SharedMountedItemStorageType : MountedItemStorageType<SharedMountedItemStorage>(SharedMountedItemStorage.CODEC) {
+    override fun mount(level: Level, state: BlockState, pos: BlockPos, be: BlockEntity?): SharedMountedItemStorage? {
         if (level !is ServerLevel) return null
         if (be !is SmartBlockEntity) return null
         val behaviour = be.getBehaviour(SharedStorageBehaviour.TYPE) ?: return null
 
         val frequencyItem = behaviour.getFrequencyItem()
 
-        return EnderVaultMountedStorage(frequencyItem.stack)
+        return SharedMountedItemStorage(frequencyItem.stack)
     }
 }

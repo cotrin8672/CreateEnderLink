@@ -3,6 +3,7 @@
   "createenderlink.tooltip.frequency.click_to_set": "アイテムでクリックして設定",
   "createenderlink.tooltip.frequency.click_to_replace": "アイテムでクリックして置き換え  ",
   "block.createenderlink.ender_vault": "エンダー金庫",
+  "block.createenderlink.ender_tank": "エンダータンク",
   "createenderlink.gui.goggles.storage_stat": "ストレージの統計:",
   "createenderlink.gui.goggles.same_frequency_count": "リンク数:",
   "createenderlink.gui.goggles.block.singular": "ブロック",
