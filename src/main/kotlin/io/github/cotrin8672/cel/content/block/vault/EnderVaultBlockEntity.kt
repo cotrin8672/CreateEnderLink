@@ -4,7 +4,7 @@ import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour
 import com.simibubi.create.foundation.blockEntity.behaviour.CenteredSideValueBoxTransform
-import io.github.cotrin8672.cel.content.SharedStorageBehaviour
+import io.github.cotrin8672.cel.content.SharedItemStorageBehaviour
 import io.github.cotrin8672.cel.registry.CelBlockEntityTypes
 import io.github.cotrin8672.cel.util.CelLang
 import io.github.cotrin8672.cel.util.SharedStorageHandler
@@ -36,27 +36,25 @@ class EnderVaultBlockEntity(
         }
 
         private val blockEntities: MutableSet<EnderVaultBlockEntity> = Collections.newSetFromMap(WeakHashMap())
-
     }
 
     init {
         val isAlreadyExists = blockEntities.map { it.blockPos }.contains(this.blockPos)
-        if (!isAlreadyExists)
-            blockEntities.add(this)
+        if (!isAlreadyExists) blockEntities.add(this)
     }
 
-    fun getInventory(): IItemHandler? {
-        val behaviour = getBehaviour(SharedStorageBehaviour.TYPE) ?: return null
+    private fun getInventory(): IItemHandler? {
+        val behaviour = getBehaviour(SharedItemStorageBehaviour.TYPE) ?: return null
         val nonNullLevel = level ?: return null
         if (nonNullLevel is ServerLevel) {
-            val inventory = SharedStorageHandler.instance?.getOrCreateInventory(behaviour.getFrequencyItem())
+            val inventory = SharedStorageHandler.instance?.getOrCreateSharedItemStorage(behaviour.getFrequencyItem())
             return inventory
         }
         return null
     }
 
     override fun addBehaviours(behaviours: MutableList<BlockEntityBehaviour>) {
-        behaviours.add(SharedStorageBehaviour(this, CenteredSideValueBoxTransform { state, direction ->
+        behaviours.add(SharedItemStorageBehaviour(this, CenteredSideValueBoxTransform { state, direction ->
             state.getValue(BlockStateProperties.HORIZONTAL_AXIS) == direction.axis
         }))
     }
@@ -65,8 +63,8 @@ class EnderVaultBlockEntity(
         super.addToGoggleTooltip(tooltip, isPlayerSneaking)
 
         val count = blockEntities.count {
-            getBehaviour(SharedStorageBehaviour.TYPE).getFrequencyItem().stack.item ==
-                    it.getBehaviour(SharedStorageBehaviour.TYPE).getFrequencyItem().stack.item
+            getBehaviour(SharedItemStorageBehaviour.TYPE).getFrequencyItem().stack.item ==
+                    it.getBehaviour(SharedItemStorageBehaviour.TYPE).getFrequencyItem().stack.item
         }
 
         CelLang.translate("gui.goggles.storage_stat").forGoggles(tooltip)

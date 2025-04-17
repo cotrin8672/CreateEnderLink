@@ -8,7 +8,7 @@ import com.simibubi.create.foundation.blockEntity.SmartBlockEntity
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBox.ItemValueBox
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxRenderer
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform.Sided
-import io.github.cotrin8672.cel.content.SharedStorageBehaviour
+import io.github.cotrin8672.cel.content.SharedItemStorageBehaviour
 import net.createmod.catnip.data.Iterate
 import net.createmod.catnip.data.Pair
 import net.createmod.catnip.math.VecHelper
@@ -38,7 +38,7 @@ object FrequencyRenderer {
         if (blockEntity !is SmartBlockEntity) return
 
         for (behaviour in blockEntity.allBehaviours) {
-            if (behaviour !is SharedStorageBehaviour) continue
+            if (behaviour !is SharedItemStorageBehaviour) continue
 
             if (behaviour.slotPositioning is Sided)
                 (behaviour.slotPositioning as Sided).fromSide(target.direction)
@@ -92,7 +92,7 @@ object FrequencyRenderer {
         val blockPos = be.blockPos
 
         for (behaviour in be.allBehaviours) {
-            if (behaviour !is SharedStorageBehaviour) continue
+            if (behaviour !is SharedItemStorageBehaviour) continue
             if (!be.isVirtual) {
                 val cameraEntity = Minecraft.getInstance().cameraEntity
                 if (cameraEntity != null && level == cameraEntity.level()) {

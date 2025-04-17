@@ -26,12 +26,12 @@ import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
 import kotlin.math.max
 
-open class SharedStorageBehaviour(
+open class SharedItemStorageBehaviour(
     be: SmartBlockEntity,
     private val slotPositioning: ValueBoxTransform,
 ) : BlockEntityBehaviour(be), ValueSettingsBehaviour {
     companion object {
-        val TYPE = BehaviourType<SharedStorageBehaviour>()
+        val TYPE = BehaviourType<SharedItemStorageBehaviour>()
     }
 
     private var frequencyItem: Frequency = Frequency.EMPTY
@@ -42,7 +42,6 @@ open class SharedStorageBehaviour(
 
     override fun write(nbt: CompoundTag, registries: HolderLookup.Provider, clientPacket: Boolean) {
         nbt.put("Frequency", getFrequencyItem().stack.saveOptional(registries))
-
         super.write(nbt, registries, clientPacket)
     }
 
