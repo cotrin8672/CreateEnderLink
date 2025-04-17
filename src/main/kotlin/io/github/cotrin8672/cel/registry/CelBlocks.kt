@@ -1,6 +1,7 @@
 package io.github.cotrin8672.cel.registry
 
 import com.simibubi.create.AllCreativeModeTabs
+import com.simibubi.create.api.contraption.storage.fluid.MountedFluidStorageType.mountedFluidStorage
 import com.simibubi.create.api.contraption.storage.item.MountedItemStorageType.mountedItemStorage
 import com.simibubi.create.foundation.data.AssetLookup
 import com.simibubi.create.foundation.data.BlockStateGen
@@ -45,6 +46,7 @@ object CelBlocks {
         }
         .transform(pickaxeOnly())
         .blockstate { c, p -> p.simpleBlock(c.get(), AssetLookup.standardModel(c, p)) }
+        .transform(mountedFluidStorage(CelMountedStorageTypes.SHARED_FLUID))
         .addLayer { Supplier(RenderType::cutoutMipped) }
         .item()
         .build()

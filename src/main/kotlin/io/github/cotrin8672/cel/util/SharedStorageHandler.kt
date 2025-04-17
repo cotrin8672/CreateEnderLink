@@ -34,6 +34,12 @@ class SharedStorageHandler : SavedData() {
         }
     }
 
+    fun tick() {
+        sharedFluidStorage.values.forEach {
+            it.fluidLevel?.tickChaser()
+        }
+    }
+
     override fun save(tag: CompoundTag, registries: Provider): CompoundTag {
         val frequencies = sharedItemStorage.keys
         val listTag = ListTag()

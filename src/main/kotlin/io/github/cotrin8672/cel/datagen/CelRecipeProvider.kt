@@ -27,5 +27,16 @@ class CelRecipeProvider(
             unlockedBy("has_item_vault", has(AllBlocks.ITEM_VAULT))
             save(recipeOutput)
         }
+
+        with(ShapedRecipeBuilder.shaped(RecipeCategory.MISC, CelBlocks.ENDER_TANK.asItem())) {
+            pattern(" B ")
+            pattern("ETE")
+            pattern(" B ")
+            define('B', AllItems.BRASS_SHEET)
+            define('E', Items.ENDER_EYE)
+            define('T', AllBlocks.FLUID_TANK)
+            unlockedBy("has_item_vault", has(AllBlocks.FLUID_TANK))
+            save(recipeOutput)
+        }
     }
 }
