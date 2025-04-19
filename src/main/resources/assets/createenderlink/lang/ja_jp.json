@@ -8,5 +8,20 @@
   "createenderlink.gui.goggles.same_frequency_count": "リンク数:",
   "createenderlink.gui.goggles.block.singular": "ブロック",
   "createenderlink.gui.goggles.block.plural": "ブロック",
-  "createenderlink.gui.goggles.at_current_loading": "現在ロード中"
+  "createenderlink.gui.goggles.at_current_loading": "現在ロード中",
+  "createenderlink.ponder.ender_vault_sharing.header": "エンダー金庫によるアイテムの共有",
+  "createenderlink.ponder.ender_vault_sharing.text_1": "エンダー金庫はエンダーチェストのように、内容物を共有することができます",
+  "createenderlink.ponder.ender_vault_sharing.text_2": "エンダー金庫には周波数を設定するためのスロットがあります",
+  "createenderlink.ponder.ender_vault_sharing.text_3": "スロットにアイテムを設定することで、周波数を決める事ができます",
+  "createenderlink.ponder.ender_vault_sharing.text_4": "同じ周波数を持つエンダー金庫は内容物を共有します",
+  "createenderlink.ponder.ender_vault_sharing.text_5": "エンジニアのゴーグルを装着していると、現在リンクされているエンダー金庫の数を確認できます",
+  "createenderlink.ponder.ender_vault_contraption.header": "からくりに組み込んでのエンダー金庫の使い方",
+  "createenderlink.ponder.ender_vault_contraption.text_1": "エンダー金庫はからくりに組み込むこともできます",
+  "createenderlink.ponder.ender_vault_contraption.text_2": "からくりに組み込まれたエンダー金庫も、同じ周波数を持つものと中身を共有することができます",
+  "createenderlink.ponder.ender_tank_sharing.header": "エンダータンクによる液体の共有",
+  "createenderlink.ponder.ender_tank_sharing.text_1": "エンダータンクは内部の液体を共有することができます",
+  "createenderlink.ponder.ender_tank_sharing.text_2": "エンダータンクには周波数を設定するためのスロットがあります",
+  "createenderlink.ponder.ender_tank_sharing.text_3": "スロットにアイテムを設定することで、周波数を決めることができます",
+  "createenderlink.ponder.ender_tank_sharing.text_4": "同じ周波数を持つエンダータンクは内容物を共有します",
+  "createenderlink.ponder.ender_tank_sharing.text_5": "エンジニアのゴーグルを装着していると、現在リンクされているエンダータンクの数を確認できます"
 }

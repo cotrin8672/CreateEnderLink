@@ -8,19 +8,19 @@ import net.minecraft.nbt.CompoundTag
 import net.neoforged.neoforge.fluids.FluidStack
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank
 
-class SharedFluidTank(capacity: Int, private val handler: SharedStorageHandler) : FluidTank(capacity) {
+class SharedFluidTank(capacity: Int, private val handler: SharedStorageHandler?) : FluidTank(capacity) {
     var fluidLevel: LerpedFloat? = null
     var forceFluidLevelUpdate = true
 
     override fun onContentsChanged() {
         super.onContentsChanged()
-        handler.setDirty()
+        handler?.setDirty()
         onFluidStackChanged(getFluid())
     }
 
     override fun setFluid(stack: FluidStack) {
         super.setFluid(stack)
-        handler.setDirty()
+        handler?.setDirty()
         onFluidStackChanged(stack)
     }
 
@@ -38,8 +38,6 @@ class SharedFluidTank(capacity: Int, private val handler: SharedStorageHandler) 
         val tag = super.writeToNBT(lookupProvider, nbt)
         if (forceFluidLevelUpdate)
             tag.putBoolean("ForceFluidLevel", true)
-//        if (queuedSync)
-//            nbt.putBoolean("LazySync", true)
         forceFluidLevelUpdate = false
 
         return tag
@@ -72,8 +70,10 @@ class SharedFluidTank(capacity: Int, private val handler: SharedStorageHandler) 
             }
         }
 
-        if (fluidLevel == null)
-            fluidLevel = LerpedFloat.linear().startWithValue(getFillState().toDouble())
+        if (fluidLevel == null) {
+            val fillState = getFillState()
+            fluidLevel = LerpedFloat.linear().startWithValue(fillState.toDouble())
+        }
         fluidLevel?.chase(getFillState().toDouble(), .5, LerpedFloat.Chaser.EXP)
     }
 }

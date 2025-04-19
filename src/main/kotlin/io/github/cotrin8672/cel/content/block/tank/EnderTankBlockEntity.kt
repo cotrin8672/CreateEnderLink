@@ -9,6 +9,7 @@ import io.github.cotrin8672.cel.content.storage.SharedFluidTank
 import io.github.cotrin8672.cel.registry.CelBlockEntityTypes
 import io.github.cotrin8672.cel.util.CelLang
 import io.github.cotrin8672.cel.util.SharedStorageHandler
+import net.createmod.ponder.api.level.PonderLevel
 import net.minecraft.ChatFormatting
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -47,11 +48,15 @@ class EnderTankBlockEntity(
     }
 
     private var luminosity = 0
-
     private var queuedSync = false
     private var syncCooldown = 0
+    private var ponderTank: SharedFluidTank? = null
 
     fun getFluidTank(): SharedFluidTank? {
+        if (level is PonderLevel) {
+            if (ponderTank == null) ponderTank = SharedFluidTank(10000, null)
+            return ponderTank
+        }
         val behaviour = getBehaviour(SharedStorageBehaviour.TYPE) ?: return null
         val fluidTank = SharedStorageHandler.instance?.getOrCreateSharedFluidStorage(behaviour.getFrequencyItem())
         return fluidTank

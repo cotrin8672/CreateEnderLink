@@ -97,11 +97,11 @@ open class SharedStorageBehaviour(
         return AllConfigs.client().filterItemRenderDistance.f
     }
 
-    open fun setFilter(face: Direction?, stack: ItemStack): Boolean {
-        return setFilter(stack)
+    open fun setFrequencyItem(face: Direction?, stack: ItemStack): Boolean {
+        return setFrequencyItem(stack)
     }
 
-    open fun setFilter(stack: ItemStack): Boolean {
+    open fun setFrequencyItem(stack: ItemStack): Boolean {
         val filter = stack.copy()
         this.frequencyItem = Frequency.of(filter)
         blockEntity.setChanged()
@@ -124,7 +124,7 @@ open class SharedStorageBehaviour(
         if (!canShortInteract(toApply)) return
         if (level.isClientSide()) return
 
-        if (!setFilter(side, toApply)) {
+        if (!setFrequencyItem(side, toApply)) {
             AllSoundEvents.DENY.playOnServer(player.level(), player.blockPosition(), 1f, 1f)
         }
 

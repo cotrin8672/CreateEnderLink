@@ -1,6 +1,8 @@
 package io.github.cotrin8672.cel
 
 import io.github.cotrin8672.cel.client.FrequencyRenderer
+import io.github.cotrin8672.cel.content.ponder.CelPonderPlugin
+import net.createmod.ponder.foundation.PonderIndex
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
@@ -13,7 +15,9 @@ import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
 @Mod(value = CreateEnderLink.MOD_ID, dist = [Dist.CLIENT])
 object CreateEnderLinkClient {
     init {
-        MOD_BUS.addListener<FMLClientSetupEvent> {}
+        MOD_BUS.addListener<FMLClientSetupEvent> {
+            PonderIndex.addPlugin(CelPonderPlugin)
+        }
     }
 
     @SubscribeEvent
