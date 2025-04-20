@@ -6,6 +6,7 @@ import io.github.cotrin8672.cel.content.block.vault.EnderVaultBlockEntity
 import io.github.cotrin8672.cel.datagen.CelDatagen
 import io.github.cotrin8672.cel.registry.CelBlockEntityTypes
 import io.github.cotrin8672.cel.registry.CelBlocks
+import io.github.cotrin8672.cel.registry.CelCreativeModeTabs
 import net.minecraft.resources.ResourceLocation
 import net.neoforged.bus.api.EventPriority
 import net.neoforged.bus.api.SubscribeEvent
@@ -20,6 +21,7 @@ object CreateEnderLink {
     const val MOD_ID = "createenderlink"
 
     val REGISTRATE: CreateRegistrate = CreateRegistrate.create(MOD_ID)
+        .defaultCreativeTab(CelCreativeModeTabs.CEL_CREATIVE_TAB.key)
 
     fun asResource(path: String): ResourceLocation {
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, path)
@@ -27,6 +29,7 @@ object CreateEnderLink {
 
     init {
         REGISTRATE.registerEventListeners(MOD_BUS)
+        CelCreativeModeTabs.register(MOD_BUS)
         CelBlocks.register()
         CelBlockEntityTypes.register()
         MOD_BUS.addListener(EventPriority.LOWEST, CelDatagen::gatherData)
