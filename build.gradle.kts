@@ -90,6 +90,7 @@ repositories {
     maven("https://raw.githubusercontent.com/Fuzss/modresources/main/maven/") // Forge Config API Port
     maven("https://api.modrinth.com/maven") // Modrinth Maven
     maven("https://maven.theillusivec4.top/") // Curios API
+    maven("https://maven.blamejared.com")
 }
 
 dependencies {
@@ -104,6 +105,7 @@ dependencies {
 
     runtimeOnly("top.theillusivec4.curios:curios-neoforge:9.2.2+1.21.1")
     compileOnly("top.theillusivec4.curios:curios-neoforge:9.2.2+1.21.1:api")
+    runtimeOnly(libs.jei)
 }
 
 publisher {

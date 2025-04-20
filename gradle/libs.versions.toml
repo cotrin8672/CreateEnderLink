@@ -9,20 +9,17 @@ create = "6.0.2-32"
 flywheel = "1.0.0-9"
 ponder = "1.0.39"
 registrate = "MC1.21-1.3.0+62"
-majruszLibForge = "5302100"
-majruszLibFabric = "5301915"
 modPublisher = "2.1.6"
+jei = "19.8.2.99"
 
 [libraries]
-minecraft = { module = "net.minecraft:minecraft", version.ref = "minecraft" }
 kotlinforforge = { module = "thedarkcolour:kotlinforforge-neoforge", version.ref = "kotlinforforge" }
 create = { module = "com.simibubi.create:create-1.21.1", version.ref = "create" }
 flywheel = { module = "dev.engine-room.flywheel:flywheel-neoforge-1.21.1", version.ref = "flywheel" }
 flywheel-api = { module = "dev.engine-room.flywheel:flywheel-neoforge-api-1.21.1", version.ref = "flywheel" }
 ponder = { module = "net.createmod.ponder:Ponder-NeoForge-1.21.1", version.ref = "ponder" }
 registrate = { module = "com.tterrag.registrate:Registrate", version.ref = "registrate" }
-majrusz-library-forge = { module = "curse.maven:majrusz-library-437409", version.ref = "majruszLibForge" }
-majrusz-library-fabric = { module = "curse.maven:majrusz-library-437409", version.ref = "majruszLibFabric" }
+jei = { module = "mezz.jei:jei-1.21-neoforge", version.ref = "jei" }
 
 [plugins]
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
