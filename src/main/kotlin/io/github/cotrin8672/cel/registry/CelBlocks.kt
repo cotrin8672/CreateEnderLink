@@ -1,6 +1,5 @@
 package io.github.cotrin8672.cel.registry
 
-import com.simibubi.create.AllCreativeModeTabs
 import com.simibubi.create.api.contraption.storage.fluid.MountedFluidStorageType.mountedFluidStorage
 import com.simibubi.create.api.contraption.storage.item.MountedItemStorageType.mountedItemStorage
 import com.simibubi.create.foundation.data.AssetLookup
@@ -17,10 +16,6 @@ import net.minecraft.world.level.material.MapColor
 import java.util.function.Supplier
 
 object CelBlocks {
-    init {
-        REGISTRATE.setCreativeTab(AllCreativeModeTabs.BASE_CREATIVE_TAB)
-    }
-
     val ENDER_VAULT: BlockEntry<EnderVaultBlock> = REGISTRATE
         .block<EnderVaultBlock>("ender_vault", ::EnderVaultBlock)
         .initialProperties(SharedProperties::softMetal)
