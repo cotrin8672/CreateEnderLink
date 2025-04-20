@@ -2,7 +2,7 @@ name: Upload to CurseForge and Modrinth
 on:
   push:
     branches:
-      - mc1.21.1/release
+      - mc1.20.1/release
 
 jobs:
   upload:
