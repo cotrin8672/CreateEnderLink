@@ -6,21 +6,22 @@ import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour
 import com.simibubi.create.foundation.blockEntity.behaviour.CenteredSideValueBoxTransform
 import io.github.cotrin8672.cel.content.SharedStorageBehaviour
 import io.github.cotrin8672.cel.content.storage.SharedFluidTank
-import io.github.cotrin8672.cel.registry.CelBlockEntityTypes
 import io.github.cotrin8672.cel.util.CelLang
 import io.github.cotrin8672.cel.util.SharedStorageHandler
 import net.createmod.ponder.api.level.PonderLevel
 import net.minecraft.ChatFormatting
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
-import net.minecraft.core.HolderLookup
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
-import net.neoforged.neoforge.capabilities.Capabilities
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent
+import net.minecraftforge.common.capabilities.Capability
+import net.minecraftforge.common.capabilities.ForgeCapabilities
+import net.minecraftforge.common.util.LazyOptional
+import net.minecraftforge.fluids.capability.IFluidHandler
 import java.util.*
+import javax.annotation.Nonnull
 
 class EnderTankBlockEntity(
     type: BlockEntityType<*>,
@@ -28,15 +29,6 @@ class EnderTankBlockEntity(
     state: BlockState,
 ) : SmartBlockEntity(type, pos, state), IHaveGoggleInformation {
     companion object {
-        fun registerCapability(event: RegisterCapabilitiesEvent) {
-            event.registerBlockEntity(
-                Capabilities.FluidHandler.BLOCK,
-                CelBlockEntityTypes.ENDER_TANK.get()
-            ) { be, _ ->
-                return@registerBlockEntity be.getFluidTank()
-            }
-        }
-
         private val blockEntities: MutableSet<EnderTankBlockEntity> = Collections.newSetFromMap(WeakHashMap())
 
         fun getLoadingBlockEntities(): Set<EnderTankBlockEntity> = blockEntities.toSet()
@@ -60,6 +52,15 @@ class EnderTankBlockEntity(
         val behaviour = getBehaviour(SharedStorageBehaviour.TYPE) ?: return null
         val fluidTank = SharedStorageHandler.instance?.getOrCreateSharedFluidStorage(behaviour.getFrequencyItem())
         return fluidTank
+    }
+
+    override fun <T> getCapability(@Nonnull cap: Capability<T>, side: Direction?): LazyOptional<T> {
+        val tank = getFluidTank() ?: return super.getCapability(cap, side)
+        val fluidCapability = LazyOptional.of<IFluidHandler> { tank }
+        return if (cap === ForgeCapabilities.FLUID_HANDLER)
+            fluidCapability.cast()
+        else
+            super.getCapability(cap, side)
     }
 
     override fun addBehaviours(behaviours: MutableList<BlockEntityBehaviour>) {
@@ -87,10 +88,7 @@ class EnderTankBlockEntity(
     override fun addToGoggleTooltip(tooltip: MutableList<Component>, isPlayerSneaking: Boolean): Boolean {
         super.addToGoggleTooltip(tooltip, isPlayerSneaking)
 
-        containedFluidTooltip(
-            tooltip, isPlayerSneaking,
-            level?.getCapability(Capabilities.FluidHandler.BLOCK, blockPos, Direction.UP)
-        )
+        containedFluidTooltip(tooltip, isPlayerSneaking, this.getCapability(ForgeCapabilities.FLUID_HANDLER))
 
         val count = blockEntities.count {
             getBehaviour(SharedStorageBehaviour.TYPE).getFrequencyItem().stack.item ==
@@ -139,8 +137,8 @@ class EnderTankBlockEntity(
         syncCooldown = 8
     }
 
-    override fun read(tag: CompoundTag, registries: HolderLookup.Provider, clientPacket: Boolean) {
-        super.read(tag, registries, clientPacket)
+    override fun read(tag: CompoundTag, clientPacket: Boolean) {
+        super.read(tag, clientPacket)
 
         val prevLum = luminosity
 
@@ -149,12 +147,11 @@ class EnderTankBlockEntity(
 
         if (luminosity != prevLum && hasLevel())
             level?.chunkSource?.lightEngine?.checkBlock(worldPosition)
-
     }
 
-    override fun write(tag: CompoundTag, registries: HolderLookup.Provider, clientPacket: Boolean) {
+    override fun write(tag: CompoundTag, clientPacket: Boolean) {
         tag.putInt("Luminosity", luminosity)
-        super.write(tag, registries, clientPacket)
+        super.write(tag, clientPacket)
 
         if (!clientPacket) return
         if (queuedSync)

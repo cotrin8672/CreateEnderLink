@@ -3,20 +3,18 @@ package io.github.cotrin8672.cel.datagen
 import com.simibubi.create.AllBlocks
 import com.simibubi.create.AllItems
 import io.github.cotrin8672.cel.registry.CelBlocks
-import net.minecraft.core.HolderLookup
 import net.minecraft.data.PackOutput
+import net.minecraft.data.recipes.FinishedRecipe
 import net.minecraft.data.recipes.RecipeCategory
-import net.minecraft.data.recipes.RecipeOutput
 import net.minecraft.data.recipes.RecipeProvider
 import net.minecraft.data.recipes.ShapedRecipeBuilder
 import net.minecraft.world.item.Items
-import java.util.concurrent.CompletableFuture
+import java.util.function.Consumer
 
 class CelRecipeProvider(
     output: PackOutput,
-    registries: CompletableFuture<HolderLookup.Provider>,
-) : RecipeProvider(output, registries) {
-    override fun buildRecipes(recipeOutput: RecipeOutput) {
+) : RecipeProvider(output) {
+    override fun buildRecipes(recipeOutput: Consumer<FinishedRecipe>) {
         with(ShapedRecipeBuilder.shaped(RecipeCategory.MISC, CelBlocks.ENDER_VAULT.asItem())) {
             pattern(" B ")
             pattern("EVE")

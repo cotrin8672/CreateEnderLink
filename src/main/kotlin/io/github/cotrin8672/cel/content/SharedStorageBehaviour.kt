@@ -12,8 +12,6 @@ import com.simibubi.create.foundation.utility.CreateLang
 import com.simibubi.create.infrastructure.config.AllConfigs
 import io.github.cotrin8672.cel.util.CelLang
 import net.minecraft.core.Direction
-import net.minecraft.core.HolderLookup
-import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
@@ -40,14 +38,14 @@ open class SharedStorageBehaviour(
         return TYPE
     }
 
-    override fun write(nbt: CompoundTag, registries: HolderLookup.Provider, clientPacket: Boolean) {
-        nbt.put("Frequency", getFrequencyItem().stack.saveOptional(registries))
-        super.write(nbt, registries, clientPacket)
+    override fun write(nbt: CompoundTag, clientPacket: Boolean) {
+        nbt.put("Frequency", getFrequencyItem().stack.serializeNBT())
+        super.write(nbt, clientPacket)
     }
 
-    override fun read(nbt: CompoundTag, registries: HolderLookup.Provider, clientPacket: Boolean) {
-        frequencyItem = Frequency.of(ItemStack.parseOptional(registries, nbt.getCompound("Frequency")))
-        super.read(nbt, registries, clientPacket)
+    override fun read(nbt: CompoundTag, clientPacket: Boolean) {
+        frequencyItem = Frequency.of(ItemStack.of(nbt.getCompound("Frequency")))
+        super.read(nbt, clientPacket)
     }
 
     override fun testHit(hit: Vec3): Boolean {
@@ -69,7 +67,7 @@ open class SharedStorageBehaviour(
     override fun createBoard(player: Player?, hitResult: BlockHitResult?): ValueSettingsBoard {
         val frequency: ItemStack = getFrequencyItem().stack
         val maxAmount =
-            if (frequency.item is FilterItem) 64 else frequency.getOrDefault(DataComponents.MAX_STACK_SIZE, 64)
+            if (frequency.item is FilterItem) 64 else frequency.maxStackSize
         return ValueSettingsBoard(
             CreateLang.translateDirect("logistics.filter.extracted_amount"),
             maxAmount,
@@ -80,11 +78,7 @@ open class SharedStorageBehaviour(
     }
 
     private fun formatValue(value: ValueSettings): MutableComponent? {
-        if (value.row() == 0 && value.value() == getFrequencyItem().stack.getOrDefault(
-                DataComponents.MAX_STACK_SIZE,
-                64
-            )
-        )
+        if (value.row() == 0 && value.value() == getFrequencyItem().stack.maxStackSize)
             return CreateLang.translateDirect("logistics.filter.any_amount_short")
         return Component.literal((if (value.row() == 0) "\u2264" else "=") + max(1.0, value.value().toDouble()))
     }

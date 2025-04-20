@@ -13,18 +13,18 @@ val modVersion: String by project
 val modGroupId: String by project
 
 group = modGroupId
-version = "${modVersion}+mc${libs.versions.minecraft.get()}-neoforge"
+version = "${modVersion}+mc${libs.versions.minecraft.get()}-forge"
 
 base {
     archivesName = modId
 }
 
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(17)
 }
 
-neoForge {
-    version = libs.versions.neoforge.get()
+legacyForge {
+    version = libs.versions.forge.get()
 
     parchment {
         mappingsVersion = libs.versions.parchiment.get()
@@ -34,13 +34,13 @@ neoForge {
     runs {
         create("client") {
             client()
-            systemProperty("neoforge.enabledGameTestNamespaces", modId)
+            systemProperty("forge.enabledGameTestNamespaces", modId)
         }
 
         create("server") {
             server()
             programArgument("--nogui")
-            systemProperty("neoforge.enabledGameTestNamespaces", modId)
+            systemProperty("forge.enabledGameTestNamespaces", modId)
         }
 
         create("data") {
@@ -70,12 +70,16 @@ neoForge {
     }
 }
 
-configurations {
-    val localRuntime by configurations.creating
+val localRuntime: Configuration by configurations.creating
 
+configurations {
     configurations.named("runtimeClasspath") {
         extendsFrom(localRuntime)
     }
+}
+
+obfuscation {
+    createRemappingConfiguration(localRuntime)
 }
 
 repositories {
@@ -86,7 +90,7 @@ repositories {
     }
     maven("https://maven.blamejared.com/") // JEI
     maven("https://maven.createmod.net") // Create, Ponder, Flywheel
-    maven("https://mvn.devos.one/snapshots") // Registrate
+    maven("https://maven.tterrag.com") // Registrate
     maven("https://raw.githubusercontent.com/Fuzss/modresources/main/maven/") // Forge Config API Port
     maven("https://api.modrinth.com/maven") // Modrinth Maven
     maven("https://maven.theillusivec4.top/") // Curios API
@@ -95,17 +99,20 @@ repositories {
 
 dependencies {
     implementation(libs.kotlinforforge)
-    implementation(libs.create) {
+    modImplementation("com.simibubi.create:create-1.20.1:6.0.4-79:slim") {
         isTransitive = false
     }
-    implementation(libs.ponder)
-    compileOnly(libs.flywheel.api)
-    runtimeOnly(libs.flywheel)
-    implementation(libs.registrate)
+    modImplementation(libs.ponder)
+    modCompileOnly(libs.flywheel.api)
+    modRuntimeOnly(libs.flywheel)
+    modImplementation(libs.registrate)
 
-    runtimeOnly("top.theillusivec4.curios:curios-neoforge:9.2.2+1.21.1")
-    compileOnly("top.theillusivec4.curios:curios-neoforge:9.2.2+1.21.1:api")
-    runtimeOnly(libs.jei)
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1")!!)
+    implementation(libs.mixin.forge)
+
+//    modCompileOnly("top.theillusivec4.curios:curios-forge:5.14.1+1.20.1:api")
+//    modRuntimeOnly("top.theillusivec4.curios:curios-forge:5.14.1+1.20.1")
+//    modRuntimeOnly(libs.jei)
 }
 
 publisher {
@@ -133,7 +140,7 @@ publisher {
     }
 }
 
-val generateModMetadata = tasks.withType<ProcessResources>().configureEach {
+val generateModMetadata = tasks.register<ProcessResources>("generateModMetadata") {
     val modLicense: String by project
     val modAuthors: String by project
     val modDescription: String by project
@@ -141,8 +148,8 @@ val generateModMetadata = tasks.withType<ProcessResources>().configureEach {
     val replaceProperties = mapOf(
         "minecraftVersion" to libs.versions.minecraft.get(),
         "minecraftVersionRage" to "[${libs.versions.minecraft.get()},)",
-        "neoforgeVersion" to libs.versions.neoforge.get(),
-        "neoforgeVersionRange" to "[21.1.0,)",
+        "forgeVersion" to libs.versions.forge.get(),
+        "forgeVersionRange" to "[47.1.3,)",
         "loaderVersionRange" to "[${libs.versions.kotlinforforge.get()},)",
         "createVersionRange" to "[6.0.0,)",
         "modId" to modId,
@@ -154,9 +161,9 @@ val generateModMetadata = tasks.withType<ProcessResources>().configureEach {
     )
 
     inputs.properties(replaceProperties)
-    filesMatching(listOf("META-INF/neoforge.mods.toml")) {
-        expand(replaceProperties)
-    }
+    expand(replaceProperties)
+    from("src/main/templates")
+    into("build/generated/sources/modMetadata")
 }
 
 tasks.processResources {
@@ -164,7 +171,8 @@ tasks.processResources {
 }
 
 sourceSets.main.get().resources.srcDir("src/generated/resources")
-neoForge.ideSyncTask(tasks.processResources)
+sourceSets.main.get().resources.srcDir(generateModMetadata)
+legacyForge.ideSyncTask(generateModMetadata)
 
 tasks.named<Wrapper>("wrapper").configure {
     distributionType = Wrapper.DistributionType.BIN

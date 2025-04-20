@@ -10,7 +10,6 @@ import net.createmod.ponder.api.level.PonderLevel
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider.Context
 import net.minecraft.util.Mth
-import thedarkcolour.kotlinforforge.neoforge.forge.use
 
 class EnderTankRenderer(context: Context) : SmartBlockEntityRenderer<EnderTankBlockEntity>(context) {
     override fun renderSafe(
@@ -52,13 +51,13 @@ class EnderTankRenderer(context: Context) : SmartBlockEntityRenderer<EnderTankBl
         val zMin = tankHullWidth
         val zMax = 1 - tankHullWidth
 
-        ms.use {
-            FluidRenderer.renderFluidBox(
-                fluidStack.fluid,
-                fluidStack.amount.toLong(),
-                xMin, yMin, zMin, xMax, yMax, zMax,
-                buffer, ms, light, false, true, fluidStack.componentsPatch
-            )
-        }
+        ms.pushPose()
+        FluidRenderer.renderFluidBox(
+            fluidStack.fluid,
+            fluidStack.amount.toLong(),
+            xMin, yMin, zMin, xMax, yMax, zMax,
+            buffer, ms, light, false, true, fluidStack.tag
+        )
+        ms.popPose()
     }
 }

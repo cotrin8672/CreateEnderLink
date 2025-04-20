@@ -3,10 +3,9 @@ package io.github.cotrin8672.cel.content.storage
 import io.github.cotrin8672.cel.content.block.tank.EnderTankBlockEntity
 import io.github.cotrin8672.cel.util.SharedStorageHandler
 import net.createmod.catnip.animation.LerpedFloat
-import net.minecraft.core.HolderLookup
 import net.minecraft.nbt.CompoundTag
-import net.neoforged.neoforge.fluids.FluidStack
-import net.neoforged.neoforge.fluids.capability.templates.FluidTank
+import net.minecraftforge.fluids.FluidStack
+import net.minecraftforge.fluids.capability.templates.FluidTank
 
 class SharedFluidTank(capacity: Int, private val handler: SharedStorageHandler?) : FluidTank(capacity) {
     var fluidLevel: LerpedFloat? = null
@@ -24,9 +23,8 @@ class SharedFluidTank(capacity: Int, private val handler: SharedStorageHandler?)
         onFluidStackChanged(stack)
     }
 
-    override fun readFromNBT(lookupProvider: HolderLookup.Provider, nbt: CompoundTag): FluidTank {
-        val tank = super.readFromNBT(lookupProvider, nbt)
-
+    override fun readFromNBT(nbt: CompoundTag): FluidTank {
+        val tank = super.readFromNBT(nbt)
         val fillState = getFillState().toDouble()
         if (nbt.contains("ForceFluidLevel") || fluidLevel == null)
             fluidLevel = LerpedFloat.linear().startWithValue(fillState)
@@ -34,8 +32,8 @@ class SharedFluidTank(capacity: Int, private val handler: SharedStorageHandler?)
         return tank
     }
 
-    override fun writeToNBT(lookupProvider: HolderLookup.Provider, nbt: CompoundTag): CompoundTag {
-        val tag = super.writeToNBT(lookupProvider, nbt)
+    override fun writeToNBT(nbt: CompoundTag?): CompoundTag {
+        val tag = super.writeToNBT(nbt)
         if (forceFluidLevelUpdate)
             tag.putBoolean("ForceFluidLevel", true)
         forceFluidLevelUpdate = false

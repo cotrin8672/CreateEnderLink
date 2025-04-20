@@ -8,7 +8,7 @@ import net.minecraft.resources.ResourceLocation
 
 object CelPonderScenes {
     fun register(helper: PonderSceneRegistrationHelper<ResourceLocation>) {
-        val registry = helper.withKeyFunction { obj: ItemProviderEntry<*, *> -> obj.id }
+        val registry = helper.withKeyFunction { obj: ItemProviderEntry<*> -> obj.id }
 
         registry.forComponents(CelBlocks.ENDER_VAULT)
             .addStoryBoard("ender_vault/sharing", EnderVaultPonderScene::sharing)

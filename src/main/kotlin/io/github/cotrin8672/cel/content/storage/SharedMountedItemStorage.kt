@@ -1,6 +1,6 @@
 package io.github.cotrin8672.cel.content.storage
 
-import com.mojang.serialization.MapCodec
+import com.mojang.serialization.Codec
 import com.simibubi.create.api.contraption.storage.item.MountedItemStorage
 import com.simibubi.create.content.contraptions.Contraption
 import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler.Frequency
@@ -18,8 +18,8 @@ class SharedMountedItemStorage(
     private val frequencyItem: ItemStack,
 ) : MountedItemStorage(CelMountedStorageTypes.SHARED_ITEM.get()) {
     companion object {
-        val CODEC: MapCodec<SharedMountedItemStorage> =
-            ItemStack.CODEC.xmap(::SharedMountedItemStorage) { it.frequencyItem }.fieldOf("value")
+        val CODEC: Codec<SharedMountedItemStorage> =
+            ItemStack.CODEC.xmap(::SharedMountedItemStorage) { it.frequencyItem }
     }
 
     private val frequency = Frequency.of(frequencyItem)

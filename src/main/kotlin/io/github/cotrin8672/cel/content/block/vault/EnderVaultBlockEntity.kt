@@ -5,19 +5,20 @@ import com.simibubi.create.foundation.blockEntity.SmartBlockEntity
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour
 import com.simibubi.create.foundation.blockEntity.behaviour.CenteredSideValueBoxTransform
 import io.github.cotrin8672.cel.content.SharedStorageBehaviour
-import io.github.cotrin8672.cel.registry.CelBlockEntityTypes
 import io.github.cotrin8672.cel.util.CelLang
 import io.github.cotrin8672.cel.util.SharedStorageHandler
 import net.minecraft.ChatFormatting
 import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
-import net.neoforged.neoforge.capabilities.Capabilities
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent
-import net.neoforged.neoforge.items.IItemHandler
+import net.minecraftforge.common.capabilities.Capability
+import net.minecraftforge.common.capabilities.ForgeCapabilities
+import net.minecraftforge.common.util.LazyOptional
+import net.minecraftforge.items.IItemHandler
 import java.util.*
 
 class EnderVaultBlockEntity(
@@ -26,15 +27,6 @@ class EnderVaultBlockEntity(
     state: BlockState,
 ) : SmartBlockEntity(type, pos, state), IHaveGoggleInformation {
     companion object {
-        fun registerCapabilities(event: RegisterCapabilitiesEvent) {
-            event.registerBlockEntity(
-                Capabilities.ItemHandler.BLOCK,
-                CelBlockEntityTypes.ENDER_VAULT.get()
-            ) { be, _ ->
-                return@registerBlockEntity be.getInventory()
-            }
-        }
-
         private val blockEntities: MutableSet<EnderVaultBlockEntity> = Collections.newSetFromMap(WeakHashMap())
     }
 
@@ -51,6 +43,13 @@ class EnderVaultBlockEntity(
             return inventory
         }
         return null
+    }
+
+    override fun <T : Any?> getCapability(cap: Capability<T>, side: Direction?): LazyOptional<T> {
+        val inventory = getInventory() ?: return super.getCapability(cap, side)
+        return if (cap == ForgeCapabilities.ITEM_HANDLER)
+            LazyOptional.of<IItemHandler> { inventory }.cast()
+        else super.getCapability(cap, side)
     }
 
     override fun addBehaviours(behaviours: MutableList<BlockEntityBehaviour>) {

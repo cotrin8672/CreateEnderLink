@@ -20,7 +20,6 @@ import net.minecraft.network.chat.MutableComponent
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
-import thedarkcolour.kotlinforforge.neoforge.forge.use
 
 object FrequencyRenderer {
     fun tick() {
@@ -118,27 +117,27 @@ object FrequencyRenderer {
                     slotPositioning.fromSide(direction)
                     if (!slotPositioning.shouldRender(level, blockPos, blockState)) continue
 
-                    ms.use {
-                        slotPositioning.transform(level, blockPos, blockState, ms)
-                        if (AllBlocks.CONTRAPTION_CONTROLS.has(blockState))
-                            ValueBoxRenderer.renderFlatItemIntoValueBox(frequency.stack, ms, buffer, light, overlay)
-                        else
-                            ValueBoxRenderer.renderItemIntoValueBox(frequency.stack, ms, buffer, light, overlay)
-                    }
+                    ms.pushPose()
+                    slotPositioning.transform(level, blockPos, blockState, ms)
+                    if (AllBlocks.CONTRAPTION_CONTROLS.has(blockState))
+                        ValueBoxRenderer.renderFlatItemIntoValueBox(frequency.stack, ms, buffer, light, overlay)
+                    else
+                        ValueBoxRenderer.renderItemIntoValueBox(frequency.stack, ms, buffer, light, overlay)
+                    ms.popPose()
                 }
                 slotPositioning.fromSide(side)
                 continue
             } else if (slotPositioning.shouldRender(level, blockPos, blockState)) {
-                ms.use {
-                    slotPositioning.transform(level, blockPos, blockState, ms)
-                    ValueBoxRenderer.renderItemIntoValueBox(
-                        behaviour.getFrequencyItem().stack,
-                        ms,
-                        buffer,
-                        light,
-                        overlay
-                    )
-                }
+                ms.pushPose()
+                slotPositioning.transform(level, blockPos, blockState, ms)
+                ValueBoxRenderer.renderItemIntoValueBox(
+                    behaviour.getFrequencyItem().stack,
+                    ms,
+                    buffer,
+                    light,
+                    overlay
+                )
+                ms.popPose()
             }
         }
     }

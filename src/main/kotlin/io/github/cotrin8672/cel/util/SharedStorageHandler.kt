@@ -3,7 +3,6 @@ package io.github.cotrin8672.cel.util
 import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler.Frequency
 import io.github.cotrin8672.cel.content.storage.SharedFluidTank
 import io.github.cotrin8672.cel.content.storage.SharedItemStackHandler
-import net.minecraft.core.HolderLookup.Provider
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.Tag
@@ -17,7 +16,7 @@ class SharedStorageHandler : SavedData() {
     companion object {
         fun create() = SharedStorageHandler()
 
-        fun load(tag: CompoundTag, registries: Provider) = create().load(tag, registries)
+        fun load(tag: CompoundTag) = create().load(tag)
 
         var instance: SharedStorageHandler? = null
     }
@@ -40,13 +39,13 @@ class SharedStorageHandler : SavedData() {
         }
     }
 
-    override fun save(tag: CompoundTag, registries: Provider): CompoundTag {
+    override fun save(tag: CompoundTag): CompoundTag {
         val frequencies = sharedItemStorage.keys
         val listTag = ListTag()
         for (frequency in frequencies) {
             val pairTag = CompoundTag().apply {
-                put("Frequency", frequency.stack.saveOptional(registries))
-                sharedItemStorage[frequency]?.serializeNBT(registries)?.let { put("Inventory", it) }
+                put("Frequency", frequency.stack.serializeNBT())
+                sharedItemStorage[frequency]?.serializeNBT()?.let { put("Inventory", it) }
             }
             listTag.add(pairTag)
         }
@@ -56,8 +55,8 @@ class SharedStorageHandler : SavedData() {
         val fluidListTag = ListTag()
         for (fluidFrequency in fluidFrequencies) {
             val pairTag = CompoundTag().apply {
-                put("Frequency", fluidFrequency.stack.saveOptional(registries))
-                sharedFluidStorage[fluidFrequency]?.writeToNBT(registries, CompoundTag())?.let { put("Tank", it) }
+                put("Frequency", fluidFrequency.stack.serializeNBT())
+                sharedFluidStorage[fluidFrequency]?.writeToNBT(CompoundTag())?.let { put("Tank", it) }
             }
             fluidListTag.add(pairTag)
         }
@@ -66,15 +65,15 @@ class SharedStorageHandler : SavedData() {
         return tag
     }
 
-    fun load(tag: CompoundTag, registries: Provider): SharedStorageHandler {
+    fun load(tag: CompoundTag): SharedStorageHandler {
         val list = tag.getList("SharedStorage", Tag.TAG_COMPOUND.toInt())
         for (item in list.asIterable()) {
             if (item !is CompoundTag) continue
             val frequencyTag = item.getCompound("Frequency") ?: continue
             val inventoryTag = item.getCompound("Inventory") ?: continue
 
-            val frequency = Frequency.of(ItemStack.parseOptional(registries, frequencyTag))
-            val inventory = SharedItemStackHandler(27, this).apply { deserializeNBT(registries, inventoryTag) }
+            val frequency = Frequency.of(ItemStack.of(frequencyTag))
+            val inventory = SharedItemStackHandler(27, this).apply { deserializeNBT(inventoryTag) }
 
             sharedItemStorage[frequency] = inventory
         }
@@ -85,8 +84,8 @@ class SharedStorageHandler : SavedData() {
             val frequencyTag = fluidItem.getCompound("Frequency") ?: continue
             val fluidTankTag = fluidItem.getCompound("Tank") ?: continue
 
-            val frequency = Frequency.of(ItemStack.parseOptional(registries, frequencyTag))
-            val fluidTank = SharedFluidTank(10000, this).apply { readFromNBT(registries, fluidTankTag) }
+            val frequency = Frequency.of(ItemStack.of(frequencyTag))
+            val fluidTank = SharedFluidTank(10000, this).apply { readFromNBT(fluidTankTag) }
 
             sharedFluidStorage[frequency] = fluidTank
         }

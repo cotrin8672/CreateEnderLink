@@ -1,27 +1,30 @@
 [versions]
-kotlin = "2.1.0"
-minecraft = "1.21.1"
-parchiment = "2024.11.17"
-neoforge = "21.1.125"
-modDevGradle = "2.0.78"
-kotlinforforge = "5.7.0"
-create = "6.0.2-32"
-flywheel = "1.0.0-9"
-ponder = "1.0.39"
-registrate = "MC1.21-1.3.0+62"
+kotlin = "2.0.0"
+minecraft = "1.20.1"
+parchiment = "2023.09.03"
+forge = "1.20.1-47.3.0"
+modDevGradle = "2.0.80"
+kotlinforforge = "4.11.0"
+create = "6.0.4-79"
+flywheel = "1.0.2"
+ponder = "1.0.52"
+registrate = "MC1.20-1.3.3"
 modPublisher = "2.1.6"
-jei = "19.8.2.99"
+mixin = "0.4.1"
+jei = "15.20.0.106"
 
 [libraries]
-kotlinforforge = { module = "thedarkcolour:kotlinforforge-neoforge", version.ref = "kotlinforforge" }
-create = { module = "com.simibubi.create:create-1.21.1", version.ref = "create" }
-flywheel = { module = "dev.engine-room.flywheel:flywheel-neoforge-1.21.1", version.ref = "flywheel" }
-flywheel-api = { module = "dev.engine-room.flywheel:flywheel-neoforge-api-1.21.1", version.ref = "flywheel" }
-ponder = { module = "net.createmod.ponder:Ponder-NeoForge-1.21.1", version.ref = "ponder" }
+kotlinforforge = { module = "thedarkcolour:kotlinforforge", version.ref = "kotlinforforge" }
+create = { module = "com.simibubi.create:create-1.20.1", version.ref = "create" }
+flywheel = { module = "dev.engine-room.flywheel:flywheel-forge-1.20.1", version.ref = "flywheel" }
+flywheel-api = { module = "dev.engine-room.flywheel:flywheel-forge-api-1.20.1", version.ref = "flywheel" }
+ponder = { module = "net.createmod.ponder:Ponder-Forge-1.20.1", version.ref = "ponder" }
 registrate = { module = "com.tterrag.registrate:Registrate", version.ref = "registrate" }
-jei = { module = "mezz.jei:jei-1.21-neoforge", version.ref = "jei" }
+mixin-common = { module = "io.github.llamalad7:mixinextras-common", version.ref = "mixin" }
+mixin-forge = { module = "io.github.llamalad7:mixinextras-forge", version.ref = "mixin" }
+jei = { module = "mezz.jei:jei-1.20.1-forge", version.ref = "jei" }
 
 [plugins]
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-modDevGradle = { id = "net.neoforged.moddev", version.ref = "modDevGradle" }
+modDevGradle = { id = "net.neoforged.moddev.legacyforge", version.ref = "modDevGradle" }
 modPublisher = { id = "com.hypherionmc.modutils.modpublisher", version.ref = "modPublisher" }

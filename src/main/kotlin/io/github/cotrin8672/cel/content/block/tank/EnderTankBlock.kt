@@ -7,9 +7,8 @@ import io.github.cotrin8672.cel.registry.CelBlockEntityTypes
 import net.minecraft.core.BlockPos
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.InteractionHand
-import net.minecraft.world.ItemInteractionResult
+import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.entity.BlockEntityType
@@ -25,18 +24,19 @@ class EnderTankBlock(properties: Properties) : Block(properties), IWrenchable, I
         return CelBlockEntityTypes.ENDER_TANK.get()
     }
 
-    override fun useItemOn(
-        stack: ItemStack,
+    @Deprecated("Deprecated in Java")
+    override fun use(
         state: BlockState,
         level: Level,
         pos: BlockPos,
         player: Player,
         hand: InteractionHand,
-        hitResult: BlockHitResult,
-    ): ItemInteractionResult {
-        val be = level.getBlockEntity(pos) as? EnderTankBlockEntity ?: return ItemInteractionResult.FAIL
-        val tank = be.getFluidTank() ?: return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+        hit: BlockHitResult,
+    ): InteractionResult {
+        val be = level.getBlockEntity(pos) as? EnderTankBlockEntity ?: return InteractionResult.FAIL
+        val tank = be.getFluidTank() ?: return InteractionResult.PASS
         val prev = tank.getFluidInTank(0).copy()
+        val stack = player.getItemInHand(hand)
 
         val didTransfer = when {
             FluidHelper.tryEmptyItemIntoBE(level, player, hand, stack, be) -> true
@@ -44,7 +44,7 @@ class EnderTankBlock(properties: Properties) : Block(properties), IWrenchable, I
             else -> false
         }
 
-        if (!didTransfer) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+        if (!didTransfer) return InteractionResult.PASS
 
         if (!level.isClientSide) {
             val current = tank.getFluidInTank(0)
@@ -59,6 +59,6 @@ class EnderTankBlock(properties: Properties) : Block(properties), IWrenchable, I
             }
         }
 
-        return ItemInteractionResult.SUCCESS
+        return InteractionResult.SUCCESS
     }
 }
