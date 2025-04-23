@@ -7,10 +7,6 @@ object CelDatagen {
     fun gatherData(event: GatherDataEvent) {
         val generator = event.generator
         val packOutput = generator.packOutput
-//        generator.addProvider(
-//            event.inc,
-//            REGISTRATE.setDataProvider(RegistrateDataProvider(REGISTRATE, MOD_ID, event))
-//        )
         generator.addProvider(true, CelRecipeProvider(packOutput))
     }
 }
