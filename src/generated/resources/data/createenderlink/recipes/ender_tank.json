@@ -8,17 +8,17 @@
     "E": {
       "item": "minecraft:ender_eye"
     },
-    "V": {
-      "item": "create:item_vault"
+    "T": {
+      "item": "create:fluid_tank"
     }
   },
   "pattern": [
     " B ",
-    "EVE",
+    "ETE",
     " B "
   ],
   "result": {
-    "count": 1,
-    "id": "createenderlink:ender_vault"
-  }
+    "item": "createenderlink:ender_tank"
+  },
+  "show_notification": true
 }

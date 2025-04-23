@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": "create:item_vault"
+            "items": [
+              "create:item_vault"
+            ]
           }
         ]
       },
@@ -20,13 +22,14 @@
   },
   "requirements": [
     [
-      "has_the_recipe",
-      "has_item_vault"
+      "has_item_vault",
+      "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
       "createenderlink:ender_vault"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }
