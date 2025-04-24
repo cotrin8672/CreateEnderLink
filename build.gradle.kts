@@ -128,7 +128,7 @@ publisher {
     version.set(project.version.toString())
     displayName.set("$modName $modVersion")
     setGameVersions(libs.versions.minecraft.get())
-    setLoaders(ModLoader.NEOFORGE)
+    setLoaders(ModLoader.FORGE)
     setCurseEnvironment(CurseEnvironment.BOTH)
     artifact.set("build/libs/${base.archivesName.get()}-${project.version}.jar")
 
