@@ -66,4 +66,10 @@ class ScopeFilterItem(properties: Properties) : Item(properties), MenuProvider {
     override fun getDisplayName(): Component {
         return CelLang.itemName(CelItems.SCOPE_FILTER.asStack()).component()
     }
+
+    fun getFrequencyItem(stack: ItemStack): ItemStack {
+        val frequencyItemContainer = stack.get(CelDataComponents.FREQUENCY_ITEM) ?: return ItemStack.EMPTY
+        if (frequencyItemContainer.slots == 0) return ItemStack.EMPTY
+        return frequencyItemContainer.getStackInSlot(0)
+    }
 }

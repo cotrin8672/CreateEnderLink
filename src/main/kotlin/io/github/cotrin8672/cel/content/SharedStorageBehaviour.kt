@@ -9,6 +9,7 @@ import com.simibubi.create.foundation.blockEntity.behaviour.*
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueSettingsBehaviour.ValueSettings
 import com.simibubi.create.foundation.utility.CreateLang
 import com.simibubi.create.infrastructure.config.AllConfigs
+import io.github.cotrin8672.cel.content.item.ScopeFilterItem
 import io.github.cotrin8672.cel.registry.CelDataComponents
 import io.github.cotrin8672.cel.registry.CelItems
 import io.github.cotrin8672.cel.util.CelLang
@@ -122,14 +123,14 @@ open class SharedStorageBehaviour(
     open fun setFrequencyItem(stack: ItemStack): Boolean {
         val filter = stack.copy()
         storageFrequency = if (filter.`is`(CelItems.SCOPE_FILTER)) {
-            val frequencyItemContainer = stack.get(CelDataComponents.FREQUENCY_ITEM)
+            val item = filter.item as ScopeFilterItem
             val frequencyOwnerUUID = stack.get(CelDataComponents.FREQUENCY_OWNER_UUID)
             val frequencyOwnerName = stack.get(CelDataComponents.FREQUENCY_OWNER_NAME)
 
-            if (frequencyItemContainer?.slots == 0 || frequencyOwnerUUID == null) {
+            if (frequencyOwnerUUID == null) {
                 StorageFrequency.of(filter)
             } else {
-                val frequencyItem = frequencyItemContainer?.getStackInSlot(0) ?: ItemStack.EMPTY
+                val frequencyItem = item.getFrequencyItem(filter)
                 StorageFrequency.of(frequencyItem, frequencyOwnerUUID, frequencyOwnerName)
             }
         } else {
@@ -166,6 +167,7 @@ open class SharedStorageBehaviour(
         }
 
         if (toApply.`is`(CelItems.SCOPE_FILTER) && !player.isCreative) {
+            val item = toApply.item as ScopeFilterItem
             if (itemInHand.count == 1) {
                 player.setItemInHand(hand, ItemStack.EMPTY)
             } else {

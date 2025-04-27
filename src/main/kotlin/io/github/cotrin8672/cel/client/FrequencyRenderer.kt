@@ -108,7 +108,7 @@ object FrequencyRenderer {
             }
 
             if (!behaviour.isActive) continue
-            if (behaviour.getFrequency().stack.isEmpty) continue
+            if (behaviour.getFrequency().stack.isEmpty && behaviour.getFrequency().playerUuid == null) continue
 
             val slotPositioning = behaviour.slotPositioning
             val blockState = be.blockState
@@ -117,7 +117,7 @@ object FrequencyRenderer {
                 val side = slotPositioning.side
                 for (direction in Iterate.directions) {
                     val frequency = behaviour.getFrequency()
-                    if (frequency.stack.isEmpty) continue
+                    if (frequency.stack.isEmpty && behaviour.getFrequency().playerUuid == null) continue
 
                     slotPositioning.fromSide(direction)
                     if (!slotPositioning.shouldRender(level, blockPos, blockState)) continue
