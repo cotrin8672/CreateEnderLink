@@ -1,6 +1,5 @@
 package io.github.cotrin8672.cel.util
 
-import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler.Frequency
 import io.github.cotrin8672.cel.content.storage.SharedFluidTank
 import io.github.cotrin8672.cel.content.storage.SharedItemStackHandler
 import net.minecraft.core.HolderLookup.Provider
@@ -11,8 +10,8 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.saveddata.SavedData
 
 class SharedStorageHandler : SavedData() {
-    private val sharedItemStorage = mutableMapOf<Frequency, SharedItemStackHandler>()
-    private val sharedFluidStorage = mutableMapOf<Frequency, SharedFluidTank>()
+    private val sharedItemStorage = mutableMapOf<StorageFrequency, SharedItemStackHandler>()
+    private val sharedFluidStorage = mutableMapOf<StorageFrequency, SharedFluidTank>()
 
     companion object {
         fun create() = SharedStorageHandler()
@@ -22,13 +21,13 @@ class SharedStorageHandler : SavedData() {
         var instance: SharedStorageHandler? = null
     }
 
-    fun getOrCreateSharedItemStorage(frequency: Frequency): SharedItemStackHandler {
+    fun getOrCreateSharedItemStorage(frequency: StorageFrequency): SharedItemStackHandler {
         return sharedItemStorage.computeIfAbsent(frequency) {
             SharedItemStackHandler(27, this)
         }
     }
 
-    fun getOrCreateSharedFluidStorage(frequency: Frequency): SharedFluidTank {
+    fun getOrCreateSharedFluidStorage(frequency: StorageFrequency): SharedFluidTank {
         return sharedFluidStorage.computeIfAbsent(frequency) {
             SharedFluidTank(10000, this)
         }
@@ -45,7 +44,8 @@ class SharedStorageHandler : SavedData() {
         val listTag = ListTag()
         for (frequency in frequencies) {
             val pairTag = CompoundTag().apply {
-                put("Frequency", frequency.stack.saveOptional(registries))
+                put("FrequencyItem", frequency.stack.saveOptional(registries))
+                putString("FrequencyOwner", frequency.playerUuid.toString())
                 sharedItemStorage[frequency]?.serializeNBT(registries)?.let { put("Inventory", it) }
             }
             listTag.add(pairTag)
@@ -56,7 +56,8 @@ class SharedStorageHandler : SavedData() {
         val fluidListTag = ListTag()
         for (fluidFrequency in fluidFrequencies) {
             val pairTag = CompoundTag().apply {
-                put("Frequency", fluidFrequency.stack.saveOptional(registries))
+                put("FrequencyItem", fluidFrequency.stack.saveOptional(registries))
+                putString("FrequencyOwner", fluidFrequency.playerUuid.toString())
                 sharedFluidStorage[fluidFrequency]?.writeToNBT(registries, CompoundTag())?.let { put("Tank", it) }
             }
             fluidListTag.add(pairTag)
@@ -70,10 +71,16 @@ class SharedStorageHandler : SavedData() {
         val list = tag.getList("SharedStorage", Tag.TAG_COMPOUND.toInt())
         for (item in list.asIterable()) {
             if (item !is CompoundTag) continue
-            val frequencyTag = item.getCompound("Frequency") ?: continue
-            val inventoryTag = item.getCompound("Inventory") ?: continue
 
-            val frequency = Frequency.of(ItemStack.parseOptional(registries, frequencyTag))
+            val frequencyItemTag = when {
+                item.contains("Frequency", Tag.TAG_COMPOUND.toInt()) -> item.getCompound("Frequency")
+                item.contains("FrequencyItem", Tag.TAG_COMPOUND.toInt()) -> item.getCompound("FrequencyItem")
+                else -> continue
+            }
+            val frequencyUUID = item.getString("FrequencyOwner")
+            val inventoryTag = item.getCompound("Inventory")
+
+            val frequency = StorageFrequency.of(ItemStack.parseOptional(registries, frequencyItemTag), frequencyUUID)
             val inventory = SharedItemStackHandler(27, this).apply { deserializeNBT(registries, inventoryTag) }
 
             sharedItemStorage[frequency] = inventory
@@ -82,10 +89,16 @@ class SharedStorageHandler : SavedData() {
         val fluidList = tag.getList("SharedFluidStorage", Tag.TAG_COMPOUND.toInt())
         for (fluidItem in fluidList.asIterable()) {
             if (fluidItem !is CompoundTag) continue
-            val frequencyTag = fluidItem.getCompound("Frequency") ?: continue
-            val fluidTankTag = fluidItem.getCompound("Tank") ?: continue
 
-            val frequency = Frequency.of(ItemStack.parseOptional(registries, frequencyTag))
+            val frequencyItemTag = when {
+                fluidItem.contains("Frequency", Tag.TAG_COMPOUND.toInt()) -> fluidItem.getCompound("Frequency")
+                fluidItem.contains("FrequencyItem", Tag.TAG_COMPOUND.toInt()) -> fluidItem.getCompound("FrequencyItem")
+                else -> continue
+            }
+            val frequencyUUID = fluidItem.getString("FrequencyOwner")
+            val fluidTankTag = fluidItem.getCompound("Tank")
+
+            val frequency = StorageFrequency.of(ItemStack.parseOptional(registries, frequencyItemTag), frequencyUUID)
             val fluidTank = SharedFluidTank(10000, this).apply { readFromNBT(registries, fluidTankTag) }
 
             sharedFluidStorage[frequency] = fluidTank

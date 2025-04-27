@@ -9,6 +9,8 @@ import com.simibubi.create.foundation.blockEntity.behaviour.ValueBox.ItemValueBo
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxRenderer
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform.Sided
 import io.github.cotrin8672.cel.content.SharedStorageBehaviour
+import io.github.cotrin8672.cel.registry.CelItems
+import io.github.cotrin8672.cel.util.StorageFrequency
 import net.createmod.catnip.data.Iterate
 import net.createmod.catnip.data.Pair
 import net.createmod.catnip.math.VecHelper
@@ -23,6 +25,8 @@ import net.minecraft.world.phys.Vec3
 import thedarkcolour.kotlinforforge.neoforge.forge.use
 
 object FrequencyRenderer {
+    private val scopeFilter = CelItems.SCOPE_FILTER.asStack()
+
     fun tick() {
         val mc = Minecraft.getInstance()
         val target = mc.hitResult
@@ -44,7 +48,7 @@ object FrequencyRenderer {
                 (behaviour.slotPositioning as Sided).fromSide(target.direction)
             if (!behaviour.slotPositioning.shouldRender(level, pos, state)) continue
 
-            val frequencyItem = behaviour.getFrequencyItem().stack
+            val frequencyItem = behaviour.getFrequency().stack
             val hit = behaviour.slotPositioning.testHit(
                 level,
                 pos,
@@ -104,7 +108,7 @@ object FrequencyRenderer {
             }
 
             if (!behaviour.isActive) continue
-            if (behaviour.getFrequencyItem().stack.isEmpty) continue
+            if (behaviour.getFrequency().stack.isEmpty) continue
 
             val slotPositioning = behaviour.slotPositioning
             val blockState = be.blockState
@@ -112,7 +116,7 @@ object FrequencyRenderer {
             if (slotPositioning is Sided) {
                 val side = slotPositioning.side
                 for (direction in Iterate.directions) {
-                    val frequency = behaviour.getFrequencyItem()
+                    val frequency = behaviour.getFrequency()
                     if (frequency.stack.isEmpty) continue
 
                     slotPositioning.fromSide(direction)
@@ -122,8 +126,9 @@ object FrequencyRenderer {
                         slotPositioning.transform(level, blockPos, blockState, ms)
                         if (AllBlocks.CONTRAPTION_CONTROLS.has(blockState))
                             ValueBoxRenderer.renderFlatItemIntoValueBox(frequency.stack, ms, buffer, light, overlay)
-                        else
-                            ValueBoxRenderer.renderItemIntoValueBox(frequency.stack, ms, buffer, light, overlay)
+                        else {
+                            ms.renderFrequencyItem(frequency, buffer, light, overlay)
+                        }
                     }
                 }
                 slotPositioning.fromSide(side)
@@ -131,14 +136,40 @@ object FrequencyRenderer {
             } else if (slotPositioning.shouldRender(level, blockPos, blockState)) {
                 ms.use {
                     slotPositioning.transform(level, blockPos, blockState, ms)
-                    ValueBoxRenderer.renderItemIntoValueBox(
-                        behaviour.getFrequencyItem().stack,
-                        ms,
-                        buffer,
-                        light,
-                        overlay
-                    )
+                    ms.renderFrequencyItem(behaviour.getFrequency(), buffer, light, overlay)
                 }
+            }
+        }
+    }
+
+    private fun PoseStack.renderFrequencyItem(
+        frequency: StorageFrequency,
+        buffer: MultiBufferSource,
+        light: Int,
+        overlay: Int,
+    ) {
+        val frequencyItem = frequency.stack
+        val frequencyOwner = frequency.playerUuid
+
+        if (frequencyOwner != null) {
+            val mc = Minecraft.getInstance()
+            val itemRenderer = mc.itemRenderer
+            val modelWithOverrides = itemRenderer.getModel(frequencyItem, null, null, 0)
+            val blockItem = modelWithOverrides.isGui3d
+            val factor = if (blockItem) 1.25f else 1f
+            val scale = 1.75f * factor
+
+            this.use {
+                this.scale(scale, scale, 1f)
+                ValueBoxRenderer.renderItemIntoValueBox(scopeFilter, this, buffer, light, overlay)
+            }
+            this.use {
+                translate(0f, 0f, -0.0001f)
+                ValueBoxRenderer.renderItemIntoValueBox(frequencyItem, this, buffer, light, overlay)
+            }
+        } else {
+            this.use {
+                ValueBoxRenderer.renderItemIntoValueBox(frequencyItem, this, buffer, light, overlay)
             }
         }
     }

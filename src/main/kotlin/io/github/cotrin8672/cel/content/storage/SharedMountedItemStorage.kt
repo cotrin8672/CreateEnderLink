@@ -3,9 +3,9 @@ package io.github.cotrin8672.cel.content.storage
 import com.mojang.serialization.MapCodec
 import com.simibubi.create.api.contraption.storage.item.MountedItemStorage
 import com.simibubi.create.content.contraptions.Contraption
-import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler.Frequency
 import io.github.cotrin8672.cel.registry.CelMountedStorageTypes
 import io.github.cotrin8672.cel.util.SharedStorageHandler
+import io.github.cotrin8672.cel.util.StorageFrequency
 import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.item.ItemStack
@@ -15,14 +15,13 @@ import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate
 
 class SharedMountedItemStorage(
-    private val frequencyItem: ItemStack,
+    private val frequency: StorageFrequency,
 ) : MountedItemStorage(CelMountedStorageTypes.SHARED_ITEM.get()) {
     companion object {
         val CODEC: MapCodec<SharedMountedItemStorage> =
-            ItemStack.CODEC.xmap(::SharedMountedItemStorage) { it.frequencyItem }.fieldOf("value")
+            StorageFrequency.CODEC.xmap(::SharedMountedItemStorage) { it.frequency }.fieldOf("value")
     }
 
-    private val frequency = Frequency.of(frequencyItem)
     private val sharedItemStackHandler by lazy {
         SharedStorageHandler.instance!!.getOrCreateSharedItemStorage(frequency)
     }

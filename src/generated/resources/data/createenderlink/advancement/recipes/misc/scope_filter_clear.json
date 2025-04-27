@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_scope_filter": {
+      "conditions": {
+        "items": [
+          {
+            "items": "createenderlink:scope_filter"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "createenderlink:scope_filter_clear"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_scope_filter"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "createenderlink:scope_filter_clear"
+    ]
+  }
+}

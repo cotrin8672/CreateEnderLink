@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "createenderlink:scope_filter"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "createenderlink:scope_filter"
+  }
+}

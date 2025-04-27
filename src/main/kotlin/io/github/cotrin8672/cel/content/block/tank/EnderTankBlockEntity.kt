@@ -15,6 +15,7 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.HolderLookup
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.chat.CommonComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
@@ -58,7 +59,7 @@ class EnderTankBlockEntity(
             return ponderTank
         }
         val behaviour = getBehaviour(SharedStorageBehaviour.TYPE) ?: return null
-        val fluidTank = SharedStorageHandler.instance?.getOrCreateSharedFluidStorage(behaviour.getFrequencyItem())
+        val fluidTank = SharedStorageHandler.instance?.getOrCreateSharedFluidStorage(behaviour.getFrequency())
         return fluidTank
     }
 
@@ -91,13 +92,33 @@ class EnderTankBlockEntity(
             tooltip, isPlayerSneaking,
             level?.getCapability(Capabilities.FluidHandler.BLOCK, blockPos, Direction.UP)
         )
+        tooltip.add(CommonComponents.EMPTY)
+
+        val behaviour = getBehaviour(SharedStorageBehaviour.TYPE)
+        val frequencyItem = behaviour.getFrequency().stack
+        val frequencyOwner = behaviour.getFrequency().playerName
 
         val count = blockEntities.count {
-            getBehaviour(SharedStorageBehaviour.TYPE).getFrequencyItem().stack.item ==
-                    it.getBehaviour(SharedStorageBehaviour.TYPE).getFrequencyItem().stack.item
+            getBehaviour(SharedStorageBehaviour.TYPE).getFrequency() ==
+                    it.getBehaviour(SharedStorageBehaviour.TYPE).getFrequency()
         }
 
         CelLang.translate("gui.goggles.storage_stat").forGoggles(tooltip)
+
+        CelLang.translate("gui.goggles.frequency_scope")
+            .add(
+                if (frequencyOwner == null)
+                    CelLang.translate("gui.goggles.scope_global").component()
+                else
+                    Component.literal(frequencyOwner)
+            )
+            .style(ChatFormatting.YELLOW)
+            .forGoggles(tooltip)
+
+        CelLang.translate("gui.goggles.frequency_item")
+            .add(CelLang.itemName(frequencyItem))
+            .style(ChatFormatting.GREEN)
+            .forGoggles(tooltip)
 
         CelLang.translate("gui.goggles.same_frequency_count")
             .style(ChatFormatting.GRAY)
