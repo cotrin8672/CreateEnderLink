@@ -187,7 +187,12 @@ open class SharedStorageBehaviour(
     }
 
     open fun getTip(): MutableComponent {
-        return CelLang.translate(if (storageFrequency.stack.isEmpty) "tooltip.frequency.click_to_set" else "tooltip.frequency.click_to_replace")
+        return CelLang.translate(
+            if (storageFrequency.stack.isEmpty && storageFrequency.playerUuid == null)
+                "tooltip.frequency.click_to_set"
+            else
+                "tooltip.frequency.click_to_replace"
+        )
             .component()
     }
 
