@@ -13,6 +13,11 @@ private constructor(
     val playerUuid: UUID? = null,
     val playerName: String? = null,
 ) {
+    data class FrequencyKey(
+        val stack: ItemStack,
+        val ownerUUID: UUID? = null,
+    )
+
     companion object {
         // Codecs
         val MAP_CODEC: MapCodec<StorageFrequency> = RecordCodecBuilder.mapCodec { builder ->
@@ -29,10 +34,10 @@ private constructor(
 
         val EMPTY = StorageFrequency(ItemStack.EMPTY)
 
-        private val storageFrequencies = IdentityHashMap<Pair<ItemStack, UUID?>, StorageFrequency>()
+        private val storageFrequencies = HashMap<FrequencyKey, StorageFrequency>()
 
         fun of(stack: ItemStack, playerUuid: UUID? = null, playerName: String? = null): StorageFrequency {
-            return storageFrequencies.computeIfAbsent(stack to playerUuid) {
+            return storageFrequencies.computeIfAbsent(FrequencyKey(stack, playerUuid)) {
                 StorageFrequency(stack, playerUuid, playerName)
             }
         }
@@ -43,7 +48,7 @@ private constructor(
             } catch (_: Exception) {
                 null
             }
-            return storageFrequencies.computeIfAbsent(stack to uuid) {
+            return storageFrequencies.computeIfAbsent(FrequencyKey(stack, uuid)) {
                 StorageFrequency(stack, uuid, playerName)
             }
         }

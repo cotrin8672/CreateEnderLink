@@ -35,8 +35,6 @@ class ScopeFilterScreen(
     }
 
     override fun renderBg(graphics: GuiGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
-        init()
-
         val invX = getLeftOfCentered(AllGuiTextures.PLAYER_INVENTORY.width)
         val invY = topPos + background.height + 4
         renderPlayerInventory(graphics, invX, invY)

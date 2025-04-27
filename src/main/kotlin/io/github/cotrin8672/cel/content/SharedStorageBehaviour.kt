@@ -55,7 +55,7 @@ open class SharedStorageBehaviour(
         storageFrequency = if (nbt.contains("Frequency", Tag.TAG_COMPOUND.toInt())) {
             StorageFrequency.of(ItemStack.parseOptional(registries, nbt.getCompound("Frequency")))
         } else {
-            if (nbt.contains("FrequencyOwner")) {
+            if (nbt.contains("FrequencyOwner") && nbt.contains("FrequencyOwnerName")) {
                 StorageFrequency.of(
                     ItemStack.parseOptional(registries, nbt.getCompound("FrequencyItem")),
                     nbt.getString("FrequencyOwner"),
@@ -160,7 +160,7 @@ open class SharedStorageBehaviour(
             val scopeFilter = CelItems.SCOPE_FILTER.asStack().apply {
                 set(CelDataComponents.FREQUENCY_ITEM, ItemContainerContents.fromItems(listOf(storageFrequency.stack)))
                 set(CelDataComponents.FREQUENCY_OWNER_UUID, storageFrequency.playerUuid.toString())
-                set(CelDataComponents.FREQUENCY_OWNER_NAME, storageFrequency.playerUuid.toString())
+                set(CelDataComponents.FREQUENCY_OWNER_NAME, storageFrequency.playerName)
             }
             player.inventory.placeItemBackInInventory(scopeFilter)
         }
