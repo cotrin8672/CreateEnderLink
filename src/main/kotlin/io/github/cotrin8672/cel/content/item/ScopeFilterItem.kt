@@ -29,7 +29,8 @@ class ScopeFilterItem(properties: Properties) : Item(properties), MenuProvider {
 
     override fun use(world: Level, player: Player, hand: InteractionHand): InteractionResultHolder<ItemStack> {
         val heldItem = player.getItemInHand(hand)
-        val storageFrequency = StorageFrequency.of(ItemStack.EMPTY, player.gameProfile)
+        val oldStorageFrequency = heldItem.get(CelDataComponents.STORAGE_FREQUENCY)
+        val storageFrequency = StorageFrequency.of(oldStorageFrequency?.stack ?: ItemStack.EMPTY, player.gameProfile)
         heldItem.set(CelDataComponents.STORAGE_FREQUENCY, storageFrequency)
         if (!world.isClientSide && player is ServerPlayer)
             player.openMenu(this) { buf ->
