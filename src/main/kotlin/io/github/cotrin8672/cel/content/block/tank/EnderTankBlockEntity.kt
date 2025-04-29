@@ -96,7 +96,7 @@ class EnderTankBlockEntity(
 
         val behaviour = getBehaviour(SharedStorageBehaviour.TYPE)
         val frequencyItem = behaviour.getFrequency().stack
-        val frequencyOwner = behaviour.getFrequency().playerName
+        val frequencyOwner = behaviour.getFrequency().gameProfile
 
         val count = blockEntities.count {
             getBehaviour(SharedStorageBehaviour.TYPE).getFrequency() ==
@@ -107,10 +107,10 @@ class EnderTankBlockEntity(
 
         CelLang.translate("gui.goggles.frequency_scope")
             .add(
-                if (frequencyOwner == null)
+                if (behaviour.getFrequency().isGlobalScope)
                     CelLang.translate("gui.goggles.scope_global").component()
                 else
-                    Component.literal(frequencyOwner)
+                    Component.literal(frequencyOwner.name)
             )
             .style(ChatFormatting.YELLOW)
             .forGoggles(tooltip)

@@ -1,70 +1,122 @@
 package io.github.cotrin8672.cel.util
 
+import com.mojang.authlib.GameProfile
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
+import net.minecraft.core.HolderLookup
+import net.minecraft.core.HolderLookup.Provider
 import net.minecraft.core.component.DataComponents
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.NbtOps
+import net.minecraft.nbt.Tag
+import net.minecraft.network.RegistryFriendlyByteBuf
+import net.minecraft.network.codec.ByteBufCodecs
+import net.minecraft.network.codec.StreamCodec
+import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
+import kotlin.jvm.optionals.getOrDefault
 
 class StorageFrequency
 private constructor(
     val stack: ItemStack,
-    val playerUuid: UUID? = null,
-    val playerName: String? = null,
+    val gameProfile: GameProfile = GLOBAL_PROFILE,
 ) {
     data class FrequencyKey(
-        val stack: ItemStack,
-        val ownerUUID: UUID? = null,
+        val item: Item,
+        val color: Int,
+        val gameProfile: GameProfile = GLOBAL_PROFILE,
     )
 
+    fun copy(
+        stack: ItemStack = this.stack,
+        gameProfile: GameProfile = this.gameProfile,
+    ): StorageFrequency {
+        return of(stack, gameProfile)
+    }
+
+    val isGlobalScope: Boolean
+        get() = gameProfile == GLOBAL_PROFILE
+
+    private val isEmpty: Boolean
+        get() = this == EMPTY
+
+    val color by lazy { stack.get(DataComponents.DYED_COLOR)?.rgb ?: -1 }
+
     companion object {
+        val GLOBAL_PROFILE by lazy {
+            GameProfile(
+                UUID.fromString("83695eeb-3b18-40d8-a790-d16d749e1413"),
+                CelLang.translate("gui.goggles.scope_global").component().toString()
+            )
+        }
+
         // Codecs
-        val MAP_CODEC: MapCodec<StorageFrequency> = RecordCodecBuilder.mapCodec { builder ->
+        private val UUID_CODEC: Codec<UUID> = Codec.STRING.xmap(
+            { UUID.fromString(it) },
+            { it.toString() }
+        )
+
+        private val GAME_PROFILE_CODEC: MapCodec<GameProfile> = RecordCodecBuilder.mapCodec { builder ->
             builder.group(
-                ItemStack.CODEC.fieldOf("frequency_item").forGetter { it.stack },
-                Codec.STRING
-                    .xmap({ UUID.fromString(it) }, { it.toString() })
-                    .optionalFieldOf("frequency_owner", null)
-                    .forGetter { it.playerUuid }
+                UUID_CODEC.fieldOf("id").forGetter(GameProfile::getId),
+                Codec.STRING.fieldOf("name").forGetter(GameProfile::getName)
+            ).apply(builder, ::GameProfile)
+        }
+
+        private val MAP_CODEC: MapCodec<StorageFrequency> = RecordCodecBuilder.mapCodec { builder ->
+            builder.group(
+                ItemStack.OPTIONAL_CODEC.fieldOf("frequency_item").forGetter { it.stack },
+                GAME_PROFILE_CODEC.fieldOf("game_profile").forGetter { it.gameProfile }
             ).apply(builder, ::StorageFrequency)
         }
 
         val CODEC: Codec<StorageFrequency> = MAP_CODEC.codec()
 
+        val STREAM_CODEC: StreamCodec<RegistryFriendlyByteBuf, StorageFrequency> = StreamCodec.composite(
+            ItemStack.OPTIONAL_STREAM_CODEC,
+            { freq -> freq.stack },
+            ByteBufCodecs.GAME_PROFILE.cast(),
+            { freq -> freq.gameProfile },
+            StorageFrequency::of
+        )
+
         val EMPTY = StorageFrequency(ItemStack.EMPTY)
 
-        private val storageFrequencies = HashMap<FrequencyKey, StorageFrequency>()
+        private val storageFrequencies = ConcurrentHashMap<FrequencyKey, StorageFrequency>()
 
-        fun of(stack: ItemStack, playerUuid: UUID? = null, playerName: String? = null): StorageFrequency {
-            return storageFrequencies.computeIfAbsent(FrequencyKey(stack, playerUuid)) {
-                StorageFrequency(stack, playerUuid, playerName)
+        fun of(stack: ItemStack, gameProfile: GameProfile = GLOBAL_PROFILE): StorageFrequency {
+            val color = stack.get(DataComponents.DYED_COLOR)?.rgb ?: -1
+            return storageFrequencies.computeIfAbsent(FrequencyKey(stack.item, color, gameProfile)) {
+                StorageFrequency(stack, gameProfile)
             }
         }
 
-        fun of(stack: ItemStack, playerUuid: String, playerName: String? = null): StorageFrequency {
-            val uuid = try {
-                UUID.fromString(playerUuid)
-            } catch (_: Exception) {
-                null
-            }
-            return storageFrequencies.computeIfAbsent(FrequencyKey(stack, uuid)) {
-                StorageFrequency(stack, uuid, playerName)
-            }
+        fun parse(lookupProvider: HolderLookup.Provider, tag: CompoundTag): Optional<StorageFrequency> {
+            return CODEC.parse(NbtOps.INSTANCE, tag).resultOrPartial()
+        }
+
+        fun parseOptional(lookupProvider: Provider, tag: CompoundTag): StorageFrequency {
+            return if (tag.isEmpty) EMPTY else parse(lookupProvider, tag).orElse(EMPTY)
         }
     }
 
-    val color: Int
-        get() {
-            return stack.get(DataComponents.DYED_COLOR)?.rgb ?: -1
-        }
+    fun save(lookupProvider: Provider, tag: Tag = CompoundTag()): Tag {
+        return CODEC.encodeStart(NbtOps.INSTANCE, this).resultOrPartial().getOrDefault(CompoundTag())
+    }
+
+    fun saveOptional(lookupProvider: Provider): Tag {
+        return if (this.isEmpty) CompoundTag() else save(lookupProvider, CompoundTag())
+    }
 
     override fun equals(other: Any?): Boolean {
         if (other !is StorageFrequency) return false
-        return stack.item == other.stack.item && playerUuid == other.playerUuid && color == other.color
+        return stack.item == other.stack.item && gameProfile == other.gameProfile && color == other.color
     }
 
     override fun hashCode(): Int {
-        return (31 * stack.item.hashCode() + (playerUuid?.hashCode() ?: 0)) xor color
+        return (31 * stack.item.hashCode() + gameProfile.hashCode()) xor color
     }
 }

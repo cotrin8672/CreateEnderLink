@@ -108,7 +108,7 @@ object FrequencyRenderer {
             }
 
             if (!behaviour.isActive) continue
-            if (behaviour.getFrequency().stack.isEmpty && behaviour.getFrequency().playerUuid == null) continue
+            if (behaviour.getFrequency().stack.isEmpty && behaviour.getFrequency().isGlobalScope) continue
 
             val slotPositioning = behaviour.slotPositioning
             val blockState = be.blockState
@@ -117,7 +117,7 @@ object FrequencyRenderer {
                 val side = slotPositioning.side
                 for (direction in Iterate.directions) {
                     val frequency = behaviour.getFrequency()
-                    if (frequency.stack.isEmpty && behaviour.getFrequency().playerUuid == null) continue
+                    if (frequency.stack.isEmpty && behaviour.getFrequency().isGlobalScope) continue
 
                     slotPositioning.fromSide(direction)
                     if (!slotPositioning.shouldRender(level, blockPos, blockState)) continue
@@ -149,9 +149,8 @@ object FrequencyRenderer {
         overlay: Int,
     ) {
         val frequencyItem = frequency.stack
-        val frequencyOwner = frequency.playerUuid
 
-        if (frequencyOwner != null) {
+        if (!frequency.isGlobalScope) {
             val mc = Minecraft.getInstance()
             val itemRenderer = mc.itemRenderer
             val modelWithOverrides = itemRenderer.getModel(frequencyItem, null, null, 0)
@@ -164,7 +163,7 @@ object FrequencyRenderer {
                 ValueBoxRenderer.renderItemIntoValueBox(scopeFilter, this, buffer, light, overlay)
             }
             this.use {
-                translate(0f, 0f, -0.0001f)
+                translate(0f, 0f, -0.01f)
                 ValueBoxRenderer.renderItemIntoValueBox(frequencyItem, this, buffer, light, overlay)
             }
         } else {

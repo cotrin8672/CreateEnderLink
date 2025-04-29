@@ -13,9 +13,8 @@ import thedarkcolour.kotlinforforge.neoforge.forge.use
 
 object ScopeFilterItemDecorator : IItemDecorator {
     override fun render(guiGraphics: GuiGraphics, font: Font, stack: ItemStack, xOffset: Int, yOffset: Int): Boolean {
-        val frequencyItemContainer = stack.get(CelDataComponents.FREQUENCY_ITEM) ?: return false
-        if (frequencyItemContainer.slots == 0) return false
-        val frequencyItem = frequencyItemContainer.getStackInSlot(0) ?: return false
+        val storageFrequency = stack.get(CelDataComponents.STORAGE_FREQUENCY) ?: return false
+        val frequencyItem = storageFrequency.stack
         if (frequencyItem.isEmpty) return false
         guiGraphics.renderItemModel(xOffset + 8f, yOffset + 8f, 9f, frequencyItem)
         return true

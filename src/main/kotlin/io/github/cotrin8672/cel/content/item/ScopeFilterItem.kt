@@ -4,6 +4,7 @@ import com.simibubi.create.AllKeys
 import io.github.cotrin8672.cel.registry.CelDataComponents
 import io.github.cotrin8672.cel.registry.CelItems
 import io.github.cotrin8672.cel.util.CelLang
+import io.github.cotrin8672.cel.util.StorageFrequency
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
@@ -28,8 +29,8 @@ class ScopeFilterItem(properties: Properties) : Item(properties), MenuProvider {
 
     override fun use(world: Level, player: Player, hand: InteractionHand): InteractionResultHolder<ItemStack> {
         val heldItem = player.getItemInHand(hand)
-        heldItem.set(CelDataComponents.FREQUENCY_OWNER_UUID, player.stringUUID)
-        heldItem.set(CelDataComponents.FREQUENCY_OWNER_NAME, player.name.string)
+        val storageFrequency = StorageFrequency.of(ItemStack.EMPTY, player.gameProfile)
+        heldItem.set(CelDataComponents.STORAGE_FREQUENCY, storageFrequency)
         if (!world.isClientSide && player is ServerPlayer)
             player.openMenu(this) { buf ->
                 ItemStack.STREAM_CODEC.encode(buf, heldItem)
@@ -45,7 +46,8 @@ class ScopeFilterItem(properties: Properties) : Item(properties), MenuProvider {
     ) {
         if (AllKeys.shiftDown()) return
 
-        val frequencyOwnerName = stack.get(CelDataComponents.FREQUENCY_OWNER_NAME)
+        val storageFrequency = stack.get(CelDataComponents.STORAGE_FREQUENCY)
+        val frequencyOwnerName = storageFrequency?.gameProfile?.name
         val frequencyOwnerTip = CelLang.translate("gui.goggles.frequency_scope")
             .add(
                 if (frequencyOwnerName == null)
@@ -68,8 +70,7 @@ class ScopeFilterItem(properties: Properties) : Item(properties), MenuProvider {
     }
 
     fun getFrequencyItem(stack: ItemStack): ItemStack {
-        val frequencyItemContainer = stack.get(CelDataComponents.FREQUENCY_ITEM) ?: return ItemStack.EMPTY
-        if (frequencyItemContainer.slots == 0) return ItemStack.EMPTY
-        return frequencyItemContainer.getStackInSlot(0)
+        val storageFrequency = stack.get(CelDataComponents.STORAGE_FREQUENCY) ?: return ItemStack.EMPTY
+        return storageFrequency.stack
     }
 }

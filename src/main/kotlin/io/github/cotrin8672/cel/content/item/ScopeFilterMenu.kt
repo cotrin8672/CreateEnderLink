@@ -7,7 +7,6 @@ import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.inventory.MenuType
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.component.ItemContainerContents
 import net.neoforged.neoforge.items.ItemStackHandler
 import net.neoforged.neoforge.items.SlotItemHandler
 
@@ -51,9 +50,8 @@ class ScopeFilterMenu : GhostItemMenu<ItemStack> {
 
     override fun createGhostInventory(): ItemStackHandler {
         return ItemStackHandler(1).apply {
-            val frequencyItemContainer = contentHolder.get(CelDataComponents.FREQUENCY_ITEM) ?: return@apply
-            if (frequencyItemContainer.slots == 0) return@apply
-            val frequencyItem = frequencyItemContainer.getStackInSlot(0) ?: ItemStack.EMPTY
+            val storageFrequency = contentHolder.get(CelDataComponents.STORAGE_FREQUENCY) ?: return@apply
+            val frequencyItem = storageFrequency.stack
             setStackInSlot(0, frequencyItem)
         }
     }
@@ -63,9 +61,10 @@ class ScopeFilterMenu : GhostItemMenu<ItemStack> {
     }
 
     override fun saveData(contentHolder: ItemStack) {
-        contentHolder.set(
-            CelDataComponents.FREQUENCY_ITEM,
-            ItemContainerContents.fromItems(listOf(ghostInventory.getStackInSlot(0)))
+        val storageFrequency = contentHolder.get(CelDataComponents.STORAGE_FREQUENCY)?.copy(
+            stack = ghostInventory.getStackInSlot(0)
         )
+
+        contentHolder.set(CelDataComponents.STORAGE_FREQUENCY, storageFrequency)
     }
 }
