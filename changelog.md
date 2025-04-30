@@ -1,3 +1,3 @@
-## Fixed
+## Added
 
-- Add Creative Tab.
+- add ScopeFilter.
