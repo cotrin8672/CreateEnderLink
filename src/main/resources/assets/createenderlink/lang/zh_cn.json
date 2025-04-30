@@ -5,7 +5,7 @@
   "block.createenderlink.ender_vault": "末影保险库",
   "block.createenderlink.ender_tank": "末影流体储罐",
   "createenderlink.gui.goggles.storage_stat": "存储数据：",
-  "createenderlink.gui.goggles.same_frequency_count": "已链接数",
+  "createenderlink.gui.goggles.same_frequency_count": "已链接数：",
   "createenderlink.gui.goggles.block.singular": "个方块",
   "createenderlink.gui.goggles.block.plural": "个方块",
   "createenderlink.gui.goggles.at_current_loading": "正在运行",
