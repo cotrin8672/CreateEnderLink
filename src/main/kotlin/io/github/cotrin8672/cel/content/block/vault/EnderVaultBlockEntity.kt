@@ -19,6 +19,7 @@ import net.neoforged.neoforge.capabilities.Capabilities
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent
 import net.neoforged.neoforge.items.IItemHandler
 import java.util.*
+import kotlin.jvm.optionals.getOrDefault
 
 class EnderVaultBlockEntity(
     type: BlockEntityType<*>,
@@ -63,7 +64,7 @@ class EnderVaultBlockEntity(
         super.addToGoggleTooltip(tooltip, isPlayerSneaking)
         val behaviour = getBehaviour(SharedStorageBehaviour.TYPE)
         val frequencyItem = behaviour.getFrequency().stack
-        val frequencyOwner = behaviour.getFrequency().gameProfile
+        val frequencyOwner = behaviour.getFrequency().resolvableProfile
 
         val count = blockEntities.count {
             behaviour.getFrequency() ==
@@ -77,7 +78,7 @@ class EnderVaultBlockEntity(
                 if (behaviour.getFrequency().isGlobalScope)
                     CelLang.translate("gui.goggles.scope_global").component()
                 else
-                    Component.literal(frequencyOwner.name)
+                    Component.literal(frequencyOwner.name.getOrDefault(""))
             )
             .style(ChatFormatting.YELLOW)
             .forGoggles(tooltip)

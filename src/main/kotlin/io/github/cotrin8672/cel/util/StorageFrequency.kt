@@ -11,10 +11,10 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtOps
 import net.minecraft.nbt.Tag
 import net.minecraft.network.RegistryFriendlyByteBuf
-import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.component.ResolvableProfile
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.jvm.optionals.getOrDefault
@@ -22,23 +22,23 @@ import kotlin.jvm.optionals.getOrDefault
 class StorageFrequency
 private constructor(
     val stack: ItemStack,
-    val gameProfile: GameProfile = GLOBAL_PROFILE,
+    val resolvableProfile: ResolvableProfile = GLOBAL_PROFILE,
 ) {
     data class FrequencyKey(
         val item: Item,
         val color: Int,
-        val gameProfile: GameProfile = GLOBAL_PROFILE,
+        val gameProfile: ResolvableProfile = GLOBAL_PROFILE,
     )
 
     fun copy(
         stack: ItemStack = this.stack,
-        gameProfile: GameProfile = this.gameProfile,
+        gameProfile: ResolvableProfile = this.resolvableProfile,
     ): StorageFrequency {
         return of(stack, gameProfile)
     }
 
     val isGlobalScope: Boolean
-        get() = gameProfile == GLOBAL_PROFILE
+        get() = resolvableProfile == GLOBAL_PROFILE
 
     private val isEmpty: Boolean
         get() = this == EMPTY
@@ -47,29 +47,14 @@ private constructor(
 
     companion object {
         val GLOBAL_PROFILE by lazy {
-            GameProfile(
-                UUID.fromString("83695eeb-3b18-40d8-a790-d16d749e1413"),
-                CelLang.translate("gui.goggles.scope_global").component().toString()
-            )
+            ResolvableProfile(GameProfile(UUID.fromString("83695eeb-3b18-40d8-a790-d16d749e1413"), "Global"))
         }
 
         // Codecs
-        private val UUID_CODEC: Codec<UUID> = Codec.STRING.xmap(
-            { UUID.fromString(it) },
-            { it.toString() }
-        )
-
-        private val GAME_PROFILE_CODEC: MapCodec<GameProfile> = RecordCodecBuilder.mapCodec { builder ->
-            builder.group(
-                UUID_CODEC.fieldOf("id").forGetter(GameProfile::getId),
-                Codec.STRING.fieldOf("name").forGetter(GameProfile::getName)
-            ).apply(builder, ::GameProfile)
-        }
-
         private val MAP_CODEC: MapCodec<StorageFrequency> = RecordCodecBuilder.mapCodec { builder ->
             builder.group(
                 ItemStack.OPTIONAL_CODEC.fieldOf("frequency_item").forGetter { it.stack },
-                GAME_PROFILE_CODEC.fieldOf("game_profile").forGetter { it.gameProfile }
+                ResolvableProfile.CODEC.fieldOf("game_profile").forGetter { it.resolvableProfile }
             ).apply(builder, ::StorageFrequency)
         }
 
@@ -78,8 +63,8 @@ private constructor(
         val STREAM_CODEC: StreamCodec<RegistryFriendlyByteBuf, StorageFrequency> = StreamCodec.composite(
             ItemStack.OPTIONAL_STREAM_CODEC,
             { freq -> freq.stack },
-            ByteBufCodecs.GAME_PROFILE.cast(),
-            { freq -> freq.gameProfile },
+            ResolvableProfile.STREAM_CODEC,
+            { freq -> freq.resolvableProfile },
             StorageFrequency::of
         )
 
@@ -87,7 +72,7 @@ private constructor(
 
         private val storageFrequencies = ConcurrentHashMap<FrequencyKey, StorageFrequency>()
 
-        fun of(stack: ItemStack, gameProfile: GameProfile = GLOBAL_PROFILE): StorageFrequency {
+        fun of(stack: ItemStack, gameProfile: ResolvableProfile = GLOBAL_PROFILE): StorageFrequency {
             val color = stack.get(DataComponents.DYED_COLOR)?.rgb ?: -1
             return storageFrequencies.computeIfAbsent(FrequencyKey(stack.item, color, gameProfile)) {
                 StorageFrequency(stack, gameProfile)
@@ -113,10 +98,10 @@ private constructor(
 
     override fun equals(other: Any?): Boolean {
         if (other !is StorageFrequency) return false
-        return stack.item == other.stack.item && gameProfile == other.gameProfile && color == other.color
+        return stack.item == other.stack.item && resolvableProfile == other.resolvableProfile && color == other.color
     }
 
     override fun hashCode(): Int {
-        return (31 * stack.item.hashCode() + gameProfile.hashCode()) xor color
+        return (31 * stack.item.hashCode() + resolvableProfile.hashCode()) xor color
     }
 }

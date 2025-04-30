@@ -18,8 +18,10 @@ import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.TooltipFlag
+import net.minecraft.world.item.component.ResolvableProfile
 import net.minecraft.world.item.context.UseOnContext
 import net.minecraft.world.level.Level
+import kotlin.jvm.optionals.getOrNull
 
 class ScopeFilterItem(properties: Properties) : Item(properties), MenuProvider {
     override fun useOn(context: UseOnContext): InteractionResult {
@@ -30,7 +32,8 @@ class ScopeFilterItem(properties: Properties) : Item(properties), MenuProvider {
     override fun use(world: Level, player: Player, hand: InteractionHand): InteractionResultHolder<ItemStack> {
         val heldItem = player.getItemInHand(hand)
         val oldStorageFrequency = heldItem.get(CelDataComponents.STORAGE_FREQUENCY)
-        val storageFrequency = StorageFrequency.of(oldStorageFrequency?.stack ?: ItemStack.EMPTY, player.gameProfile)
+        val storageFrequency =
+            StorageFrequency.of(oldStorageFrequency?.stack ?: ItemStack.EMPTY, ResolvableProfile(player.gameProfile))
         heldItem.set(CelDataComponents.STORAGE_FREQUENCY, storageFrequency)
         if (!world.isClientSide && player is ServerPlayer)
             player.openMenu(this) { buf ->
@@ -48,7 +51,7 @@ class ScopeFilterItem(properties: Properties) : Item(properties), MenuProvider {
         if (AllKeys.shiftDown()) return
 
         val storageFrequency = stack.get(CelDataComponents.STORAGE_FREQUENCY)
-        val frequencyOwnerName = storageFrequency?.gameProfile?.name
+        val frequencyOwnerName = storageFrequency?.resolvableProfile?.name?.getOrNull()
         val frequencyOwnerTip = CelLang.translate("gui.goggles.frequency_scope")
             .add(
                 if (frequencyOwnerName == null)
@@ -68,10 +71,5 @@ class ScopeFilterItem(properties: Properties) : Item(properties), MenuProvider {
 
     override fun getDisplayName(): Component {
         return CelLang.itemName(CelItems.SCOPE_FILTER.asStack()).component()
-    }
-
-    fun getFrequencyItem(stack: ItemStack): ItemStack {
-        val storageFrequency = stack.get(CelDataComponents.STORAGE_FREQUENCY) ?: return ItemStack.EMPTY
-        return storageFrequency.stack
     }
 }

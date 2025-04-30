@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.state.BlockState
 import net.neoforged.neoforge.capabilities.Capabilities
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent
 import java.util.*
+import kotlin.jvm.optionals.getOrDefault
 
 class EnderTankBlockEntity(
     type: BlockEntityType<*>,
@@ -96,7 +97,7 @@ class EnderTankBlockEntity(
 
         val behaviour = getBehaviour(SharedStorageBehaviour.TYPE)
         val frequencyItem = behaviour.getFrequency().stack
-        val frequencyOwner = behaviour.getFrequency().gameProfile
+        val frequencyOwner = behaviour.getFrequency().resolvableProfile
 
         val count = blockEntities.count {
             getBehaviour(SharedStorageBehaviour.TYPE).getFrequency() ==
@@ -110,7 +111,7 @@ class EnderTankBlockEntity(
                 if (behaviour.getFrequency().isGlobalScope)
                     CelLang.translate("gui.goggles.scope_global").component()
                 else
-                    Component.literal(frequencyOwner.name)
+                    Component.literal(frequencyOwner.name.getOrDefault(""))
             )
             .style(ChatFormatting.YELLOW)
             .forGoggles(tooltip)

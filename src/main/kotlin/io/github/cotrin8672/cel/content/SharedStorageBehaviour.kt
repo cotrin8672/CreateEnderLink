@@ -172,6 +172,18 @@ open class SharedStorageBehaviour(
             .component()
     }
 
+//    override fun destroy() {
+//        if (storageFrequency.isPersonalScope) {
+//            val pos = VecHelper.getCenterOf(pos)
+//            val world = world
+//            val stack = CelItems.SCOPE_FILTER.asStack().apply {
+//                set(CelDataComponents.STORAGE_FREQUENCY, storageFrequency)
+//            }
+//            world.addFreshEntity(ItemEntity(world, pos.x, pos.y, pos.z, stack))
+//        }
+//        super.destroy()
+//    }
+
     override fun setValueSettings(
         player: Player?,
         valueSetting: ValueSettings?,
