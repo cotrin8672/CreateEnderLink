@@ -4,22 +4,27 @@ import com.simibubi.create.AllBlocks
 import com.simibubi.create.AllItems
 import com.simibubi.create.AllSoundEvents
 import com.simibubi.create.content.logistics.filter.FilterItem
-import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler.Frequency
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity
 import com.simibubi.create.foundation.blockEntity.behaviour.*
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueSettingsBehaviour.ValueSettings
 import com.simibubi.create.foundation.utility.CreateLang
 import com.simibubi.create.infrastructure.config.AllConfigs
+import io.github.cotrin8672.cel.registry.CelDataComponents
+import io.github.cotrin8672.cel.registry.CelItems
 import io.github.cotrin8672.cel.util.CelLang
+import io.github.cotrin8672.cel.util.StorageFrequency
+import net.createmod.catnip.math.VecHelper
 import net.minecraft.core.Direction
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.Tag
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.InteractionHand
+import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.BlockHitResult
@@ -34,19 +39,23 @@ open class SharedStorageBehaviour(
         val TYPE = BehaviourType<SharedStorageBehaviour>()
     }
 
-    private var frequencyItem: Frequency = Frequency.EMPTY
+    private var storageFrequency: StorageFrequency = StorageFrequency.EMPTY
 
     override fun getType(): BehaviourType<*> {
         return TYPE
     }
 
     override fun write(nbt: CompoundTag, registries: HolderLookup.Provider, clientPacket: Boolean) {
-        nbt.put("Frequency", getFrequencyItem().stack.saveOptional(registries))
+        nbt.put("StorageFrequency", getFrequency().saveOptional(registries))
         super.write(nbt, registries, clientPacket)
     }
 
     override fun read(nbt: CompoundTag, registries: HolderLookup.Provider, clientPacket: Boolean) {
-        frequencyItem = Frequency.of(ItemStack.parseOptional(registries, nbt.getCompound("Frequency")))
+        storageFrequency = if (nbt.contains("Frequency", Tag.TAG_COMPOUND.toInt())) {
+            StorageFrequency.of(ItemStack.parseOptional(registries, nbt.getCompound("Frequency")))
+        } else {
+            StorageFrequency.parseOptional(registries, nbt.getCompound("StorageFrequency"))
+        }
         super.read(nbt, registries, clientPacket)
     }
 
@@ -64,10 +73,10 @@ open class SharedStorageBehaviour(
         return slotPositioning
     }
 
-    fun getFrequencyItem(): Frequency = frequencyItem
+    fun getFrequency(): StorageFrequency = storageFrequency
 
     override fun createBoard(player: Player?, hitResult: BlockHitResult?): ValueSettingsBoard {
-        val frequency: ItemStack = getFrequencyItem().stack
+        val frequency: ItemStack = getFrequency().stack
         val maxAmount =
             if (frequency.item is FilterItem) 64 else frequency.getOrDefault(DataComponents.MAX_STACK_SIZE, 64)
         return ValueSettingsBoard(
@@ -80,7 +89,7 @@ open class SharedStorageBehaviour(
     }
 
     private fun formatValue(value: ValueSettings): MutableComponent? {
-        if (value.row() == 0 && value.value() == getFrequencyItem().stack.getOrDefault(
+        if (value.row() == 0 && value.value() == getFrequency().stack.getOrDefault(
                 DataComponents.MAX_STACK_SIZE,
                 64
             )
@@ -103,7 +112,11 @@ open class SharedStorageBehaviour(
 
     open fun setFrequencyItem(stack: ItemStack): Boolean {
         val filter = stack.copy()
-        this.frequencyItem = Frequency.of(filter)
+        storageFrequency = if (filter.`is`(CelItems.SCOPE_FILTER)) {
+            stack.get(CelDataComponents.STORAGE_FREQUENCY) ?: StorageFrequency.of(filter)
+        } else {
+            StorageFrequency.of(filter)
+        }
         blockEntity.setChanged()
         blockEntity.sendData()
         return true
@@ -112,6 +125,7 @@ open class SharedStorageBehaviour(
     open fun canShortInteract(toApply: ItemStack): Boolean {
         if (AllItems.WRENCH.isIn(toApply)) return false
         if (AllBlocks.MECHANICAL_ARM.isIn(toApply)) return false
+
         return true
     }
 
@@ -123,6 +137,21 @@ open class SharedStorageBehaviour(
 
         if (!canShortInteract(toApply)) return
         if (level.isClientSide()) return
+
+        if (storageFrequency.isPersonalScope && !player.isCreative) {
+            val scopeFilter = CelItems.SCOPE_FILTER.asStack().apply {
+                set(CelDataComponents.STORAGE_FREQUENCY, storageFrequency)
+            }
+            player.inventory.placeItemBackInInventory(scopeFilter)
+        }
+
+        if (toApply.`is`(CelItems.SCOPE_FILTER) && !player.isCreative && toApply.get(CelDataComponents.STORAGE_FREQUENCY) != null) {
+            if (itemInHand.count == 1) {
+                player.setItemInHand(hand, ItemStack.EMPTY)
+            } else {
+                itemInHand.shrink(1)
+            }
+        }
 
         if (!setFrequencyItem(side, toApply)) {
             AllSoundEvents.DENY.playOnServer(player.level(), player.blockPosition(), 1f, 1f)
@@ -136,8 +165,25 @@ open class SharedStorageBehaviour(
     }
 
     open fun getTip(): MutableComponent {
-        return CelLang.translate(if (frequencyItem.stack.isEmpty) "tooltip.frequency.click_to_set" else "tooltip.frequency.click_to_replace")
+        return CelLang.translate(
+            if (storageFrequency.stack.isEmpty && storageFrequency.isGlobalScope)
+                "tooltip.frequency.click_to_set"
+            else
+                "tooltip.frequency.click_to_replace"
+        )
             .component()
+    }
+
+    override fun destroy() {
+        if (storageFrequency.isPersonalScope) {
+            val pos = VecHelper.getCenterOf(pos)
+            val world = world
+            val stack = CelItems.SCOPE_FILTER.asStack().apply {
+                set(CelDataComponents.STORAGE_FREQUENCY, storageFrequency)
+            }
+            world.addFreshEntity(ItemEntity(world, pos.x, pos.y, pos.z, stack))
+        }
+        super.destroy()
     }
 
     override fun setValueSettings(
