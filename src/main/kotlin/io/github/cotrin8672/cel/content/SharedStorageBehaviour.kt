@@ -13,6 +13,7 @@ import io.github.cotrin8672.cel.registry.CelDataComponents
 import io.github.cotrin8672.cel.registry.CelItems
 import io.github.cotrin8672.cel.util.CelLang
 import io.github.cotrin8672.cel.util.StorageFrequency
+import net.createmod.catnip.math.VecHelper
 import net.minecraft.core.Direction
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.component.DataComponents
@@ -23,6 +24,7 @@ import net.minecraft.network.chat.MutableComponent
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.InteractionHand
+import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.BlockHitResult
@@ -136,14 +138,14 @@ open class SharedStorageBehaviour(
         if (!canShortInteract(toApply)) return
         if (level.isClientSide()) return
 
-        if (storageFrequency.isGlobalScope && !player.isCreative) {
+        if (storageFrequency.isPersonalScope && !player.isCreative) {
             val scopeFilter = CelItems.SCOPE_FILTER.asStack().apply {
                 set(CelDataComponents.STORAGE_FREQUENCY, storageFrequency)
             }
             player.inventory.placeItemBackInInventory(scopeFilter)
         }
 
-        if (toApply.`is`(CelItems.SCOPE_FILTER) && !player.isCreative) {
+        if (toApply.`is`(CelItems.SCOPE_FILTER) && !player.isCreative && toApply.get(CelDataComponents.STORAGE_FREQUENCY) != null) {
             if (itemInHand.count == 1) {
                 player.setItemInHand(hand, ItemStack.EMPTY)
             } else {
@@ -172,17 +174,17 @@ open class SharedStorageBehaviour(
             .component()
     }
 
-//    override fun destroy() {
-//        if (storageFrequency.isPersonalScope) {
-//            val pos = VecHelper.getCenterOf(pos)
-//            val world = world
-//            val stack = CelItems.SCOPE_FILTER.asStack().apply {
-//                set(CelDataComponents.STORAGE_FREQUENCY, storageFrequency)
-//            }
-//            world.addFreshEntity(ItemEntity(world, pos.x, pos.y, pos.z, stack))
-//        }
-//        super.destroy()
-//    }
+    override fun destroy() {
+        if (storageFrequency.isPersonalScope) {
+            val pos = VecHelper.getCenterOf(pos)
+            val world = world
+            val stack = CelItems.SCOPE_FILTER.asStack().apply {
+                set(CelDataComponents.STORAGE_FREQUENCY, storageFrequency)
+            }
+            world.addFreshEntity(ItemEntity(world, pos.x, pos.y, pos.z, stack))
+        }
+        super.destroy()
+    }
 
     override fun setValueSettings(
         player: Player?,

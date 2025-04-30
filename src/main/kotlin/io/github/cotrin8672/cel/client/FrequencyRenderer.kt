@@ -150,7 +150,7 @@ object FrequencyRenderer {
     ) {
         val frequencyItem = frequency.stack
 
-        if (!frequency.isGlobalScope) {
+        if (frequency.isPersonalScope) {
             val mc = Minecraft.getInstance()
             val itemRenderer = mc.itemRenderer
             val modelWithOverrides = itemRenderer.getModel(frequencyItem, null, null, 0)

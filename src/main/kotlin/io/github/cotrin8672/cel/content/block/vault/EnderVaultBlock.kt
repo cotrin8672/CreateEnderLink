@@ -3,8 +3,10 @@ package io.github.cotrin8672.cel.content.block.vault
 import com.simibubi.create.content.equipment.wrench.IWrenchable
 import com.simibubi.create.foundation.block.IBE
 import io.github.cotrin8672.cel.registry.CelBlockEntityTypes
+import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.item.context.BlockPlaceContext
+import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Mirror
 import net.minecraft.world.level.block.Rotation
@@ -43,5 +45,15 @@ class EnderVaultBlock(properties: Properties) : Block(properties), IWrenchable, 
 
     override fun getStateForPlacement(context: BlockPlaceContext): BlockState {
         return defaultBlockState().setValue(HORIZONTAL_AXIS, context.horizontalDirection.axis)
+    }
+
+    public override fun onRemove(
+        state: BlockState,
+        worldIn: Level,
+        pos: BlockPos,
+        newState: BlockState,
+        isMoving: Boolean,
+    ) {
+        IBE.onRemove(state, worldIn, pos, newState)
     }
 }

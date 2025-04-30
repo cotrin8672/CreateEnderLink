@@ -61,4 +61,14 @@ class EnderTankBlock(properties: Properties) : Block(properties), IWrenchable, I
 
         return ItemInteractionResult.SUCCESS
     }
+
+    public override fun onRemove(
+        state: BlockState,
+        worldIn: Level,
+        pos: BlockPos,
+        newState: BlockState,
+        isMoving: Boolean,
+    ) {
+        IBE.onRemove(state, worldIn, pos, newState)
+    }
 }

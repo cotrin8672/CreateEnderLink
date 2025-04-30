@@ -40,6 +40,9 @@ private constructor(
     val isGlobalScope: Boolean
         get() = resolvableProfile == GLOBAL_PROFILE
 
+    val isPersonalScope: Boolean
+        get() = !isGlobalScope
+
     private val isEmpty: Boolean
         get() = this == EMPTY
 
