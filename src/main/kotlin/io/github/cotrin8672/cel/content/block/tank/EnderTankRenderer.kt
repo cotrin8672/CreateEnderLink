@@ -29,7 +29,7 @@ class EnderTankRenderer(context: Context) : SmartBlockEntityRenderer<EnderTankBl
         val totalHeight = 1 - 2 * capHeight - minPuddleHeight
 
         val behaviour = blockEntity.getBehaviour(SharedStorageBehaviour.TYPE)
-        val sharedFluidTank = SharedStorageHandler.instance?.getOrCreateSharedFluidStorage(behaviour.getFrequencyItem())
+        val sharedFluidTank = SharedStorageHandler.instance?.getOrCreateSharedFluidStorage(behaviour.getFrequency())
             ?: return
         val level = if (blockEntity.level !is PonderLevel) {
             sharedFluidTank.fluidLevel?.getValue(partialTicks)

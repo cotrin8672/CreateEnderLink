@@ -5,9 +5,7 @@ import com.simibubi.create.foundation.blockEntity.SmartBlockEntity
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour
 import com.simibubi.create.foundation.blockEntity.behaviour.CenteredSideValueBoxTransform
 import io.github.cotrin8672.cel.content.SharedStorageBehaviour
-import io.github.cotrin8672.cel.util.CelLang
 import io.github.cotrin8672.cel.util.SharedStorageHandler
-import net.minecraft.ChatFormatting
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
@@ -39,7 +37,7 @@ class EnderVaultBlockEntity(
         val behaviour = getBehaviour(SharedStorageBehaviour.TYPE) ?: return null
         val nonNullLevel = level ?: return null
         if (nonNullLevel is ServerLevel) {
-            val inventory = SharedStorageHandler.instance?.getOrCreateSharedItemStorage(behaviour.getFrequencyItem())
+            val inventory = SharedStorageHandler.instance?.getOrCreateSharedItemStorage(behaviour.getFrequency())
             return inventory
         }
         return null
@@ -61,24 +59,7 @@ class EnderVaultBlockEntity(
     override fun addToGoggleTooltip(tooltip: MutableList<Component>, isPlayerSneaking: Boolean): Boolean {
         super.addToGoggleTooltip(tooltip, isPlayerSneaking)
 
-        val count = blockEntities.count {
-            getBehaviour(SharedStorageBehaviour.TYPE).getFrequencyItem().stack.item ==
-                    it.getBehaviour(SharedStorageBehaviour.TYPE).getFrequencyItem().stack.item
-        }
-
-        CelLang.translate("gui.goggles.storage_stat").forGoggles(tooltip)
-
-        CelLang.translate("gui.goggles.same_frequency_count")
-            .style(ChatFormatting.GRAY)
-            .forGoggles(tooltip)
-
-        CelLang.number(count.toDouble())
-            .space()
-            .translate(if (count > 1.0) "gui.goggles.block.plural" else "gui.goggles.block.singular")
-            .style(ChatFormatting.AQUA)
-            .space()
-            .add(CelLang.translate("gui.goggles.at_current_loading").style(ChatFormatting.DARK_GRAY))
-            .forGoggles(tooltip, 1)
+        getBehaviour(SharedStorageBehaviour.TYPE).addToGoggleTooltip(tooltip, isPlayerSneaking, blockEntities)
 
         return true
     }

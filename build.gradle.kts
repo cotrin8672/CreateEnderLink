@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin)
     alias(libs.plugins.modDevGradle)
     alias(libs.plugins.modPublisher)
+    idea
 }
 
 val modId: String by project
@@ -180,4 +181,11 @@ tasks.named<Wrapper>("wrapper").configure {
 
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
+}
+
+idea {
+    module {
+        isDownloadJavadoc = true
+        isDownloadSources = true
+    }
 }
