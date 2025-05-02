@@ -1,7 +1,7 @@
 package io.github.cotrin8672.cel.content.item
 
-import com.mojang.blaze3d.vertex.PoseStack
 import io.github.cotrin8672.cel.util.storageFrequency
+import io.github.cotrin8672.cel.util.use
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.world.item.ItemStack
@@ -26,12 +26,5 @@ object ScopeFilterItemDecorator : IItemDecorator {
             guiGraphics.renderItem(frequencyItem, xOffset, yOffset)
         }
         return true
-    }
-
-    private fun <T> PoseStack.use(block: PoseStack.() -> T): T {
-        this.pushPose()
-        val result = block(this)
-        this.popPose()
-        return result
     }
 }

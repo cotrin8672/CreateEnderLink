@@ -1,3 +1,3 @@
-## Added
+## Fixed
 
-- add ScopeFilter.
+- Fixed rendering issue.
