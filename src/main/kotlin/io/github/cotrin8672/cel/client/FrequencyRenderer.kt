@@ -11,6 +11,7 @@ import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform.Si
 import io.github.cotrin8672.cel.content.SharedStorageBehaviour
 import io.github.cotrin8672.cel.registry.CelItems
 import io.github.cotrin8672.cel.util.StorageFrequency
+import io.github.cotrin8672.cel.util.use
 import net.createmod.catnip.data.Iterate
 import net.createmod.catnip.data.Pair
 import net.createmod.catnip.math.VecHelper
@@ -22,7 +23,6 @@ import net.minecraft.network.chat.MutableComponent
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
-import thedarkcolour.kotlinforforge.forge.use
 
 object FrequencyRenderer {
     private val scopeFilter = CelItems.SCOPE_FILTER.asStack()
@@ -170,4 +170,5 @@ object FrequencyRenderer {
                 ValueBoxRenderer.renderItemIntoValueBox(frequencyItem, this, buffer, light, overlay)
             }
         }
-    }}
+    }
+}
