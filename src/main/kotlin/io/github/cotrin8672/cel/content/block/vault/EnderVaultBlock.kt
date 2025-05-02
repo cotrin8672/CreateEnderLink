@@ -31,12 +31,14 @@ class EnderVaultBlock(properties: Properties) : Block(properties), IWrenchable, 
         return CelBlockEntityTypes.ENDER_VAULT.get()
     }
 
+    @Deprecated("Deprecated in Java")
     override fun rotate(state: BlockState, rot: Rotation): BlockState {
         val axis = state.getValue(HORIZONTAL_AXIS)
         val rotatedDir = rot.rotate(Direction.fromAxisAndDirection(axis, Direction.AxisDirection.POSITIVE))
         return state.setValue(HORIZONTAL_AXIS, rotatedDir.axis)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun mirror(state: BlockState, mirrorIn: Mirror): BlockState {
         return state
     }

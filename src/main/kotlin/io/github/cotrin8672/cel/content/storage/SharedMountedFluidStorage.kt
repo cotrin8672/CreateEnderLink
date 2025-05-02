@@ -2,9 +2,9 @@ package io.github.cotrin8672.cel.content.storage
 
 import com.mojang.serialization.Codec
 import com.simibubi.create.api.contraption.storage.fluid.MountedFluidStorage
-import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler.Frequency
 import io.github.cotrin8672.cel.registry.CelMountedStorageTypes
 import io.github.cotrin8672.cel.util.SharedStorageHandler
+import io.github.cotrin8672.cel.util.StorageFrequency
 import net.minecraft.core.BlockPos
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
@@ -14,16 +14,15 @@ import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
 
 class SharedMountedFluidStorage(
-    private val frequencyItem: ItemStack,
+    private val storageFrequency: StorageFrequency,
 ) : MountedFluidStorage(CelMountedStorageTypes.SHARED_FLUID.get()) {
     companion object {
         val CODEC: Codec<SharedMountedFluidStorage> =
-            ItemStack.CODEC.xmap(::SharedMountedFluidStorage) { it.frequencyItem }
+            StorageFrequency.CODEC.xmap(::SharedMountedFluidStorage) { it.storageFrequency }
     }
 
-    private val frequency = Frequency.of(frequencyItem)
     private val sharedFluidTank by lazy {
-        SharedStorageHandler.instance!!.getOrCreateSharedFluidStorage(frequency)
+        SharedStorageHandler.instance!!.getOrCreateSharedFluidStorage(storageFrequency)
     }
 
     override fun getTanks(): Int {

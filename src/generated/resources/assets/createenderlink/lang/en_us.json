@@ -1,4 +1,5 @@
 {
   "block.createenderlink.ender_tank": "Ender Tank",
-  "block.createenderlink.ender_vault": "Ender Vault"
+  "block.createenderlink.ender_vault": "Ender Vault",
+  "item.createenderlink.scope_filter": "Scope Filter"
 }

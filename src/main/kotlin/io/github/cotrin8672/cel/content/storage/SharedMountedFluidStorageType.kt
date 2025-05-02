@@ -21,8 +21,8 @@ class SharedMountedFluidStorageType :
         if (be !is SmartBlockEntity) return null
         val behaviour = be.getBehaviour(SharedStorageBehaviour.TYPE) ?: return null
 
-        val frequencyItem = behaviour.getFrequencyItem()
+        val storageFrequency = behaviour.getFrequency()
 
-        return SharedMountedFluidStorage(frequencyItem.stack)
+        return SharedMountedFluidStorage(storageFrequency)
     }
 }

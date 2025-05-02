@@ -15,8 +15,8 @@ class SharedMountedItemStorageType : MountedItemStorageType<SharedMountedItemSto
         if (be !is SmartBlockEntity) return null
         val behaviour = be.getBehaviour(SharedStorageBehaviour.TYPE) ?: return null
 
-        val frequencyItem = behaviour.getFrequencyItem()
+        val storageFrequency = behaviour.getFrequency()
 
-        return SharedMountedItemStorage(frequencyItem.stack)
+        return SharedMountedItemStorage(storageFrequency)
     }
 }
