@@ -29,5 +29,9 @@
   "createenderlink.ponder.ender_tank_sharing.text_2": "The Ender Tank has a slot for setting its frequency",
   "createenderlink.ponder.ender_tank_sharing.text_3": "Placing an item in the slot sets the frequency",
   "createenderlink.ponder.ender_tank_sharing.text_4": "Ender Tanks with the same frequency share their contents",
-  "createenderlink.ponder.ender_tank_sharing.text_5": "When wearing Engineers' Goggles, the player can see how many Ender Tanks are currently linked"
+  "createenderlink.ponder.ender_tank_sharing.text_5": "When wearing Engineers' Goggles, the player can see how many Ender Tanks are currently linked",
+  "createenderlink.storage_frequency.set": "Copied frequency",
+  "createenderlink.storage_frequency.is_set": "Frequency configured",
+  "createenderlink.storage_frequency.craft_to_reset": "Place in crafting grid to reset",
+  "createenderlink.storage_frequency.not_holding_enough_scope_filter": "Not holding enough scope filter"
 }

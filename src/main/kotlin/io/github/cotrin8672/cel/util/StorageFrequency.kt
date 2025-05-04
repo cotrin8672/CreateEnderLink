@@ -4,7 +4,6 @@ import com.mojang.authlib.GameProfile
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.core.HolderLookup
 import net.minecraft.core.HolderLookup.Provider
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
@@ -84,7 +83,7 @@ private constructor(
             }
         }
 
-        fun parse(lookupProvider: HolderLookup.Provider, tag: CompoundTag): Optional<StorageFrequency> {
+        fun parse(lookupProvider: Provider, tag: CompoundTag): Optional<StorageFrequency> {
             return CODEC.parse(
                 lookupProvider.createSerializationContext(NbtOps.INSTANCE), tag
             ).resultOrPartial()
