@@ -43,9 +43,11 @@ private constructor(
     val isPersonalScope: Boolean
         get() = !isGlobalScope
 
-    private val isEmpty: Boolean
+    val isEmpty: Boolean
         get() = this == EMPTY
 
+    val isNotEmpty: Boolean
+        get() = !isEmpty
     val color by lazy { stack.get(DataComponents.DYED_COLOR)?.rgb ?: -1 }
 
     companion object {
@@ -78,12 +80,14 @@ private constructor(
         fun of(stack: ItemStack, gameProfile: ResolvableProfile = GLOBAL_PROFILE): StorageFrequency {
             val color = stack.get(DataComponents.DYED_COLOR)?.rgb ?: -1
             return storageFrequencies.computeIfAbsent(FrequencyKey(stack.item, color, gameProfile)) {
-                StorageFrequency(stack, gameProfile)
+                StorageFrequency(stack.item.defaultInstance, gameProfile)
             }
         }
 
         fun parse(lookupProvider: HolderLookup.Provider, tag: CompoundTag): Optional<StorageFrequency> {
-            return CODEC.parse(NbtOps.INSTANCE, tag).resultOrPartial()
+            return CODEC.parse(
+                lookupProvider.createSerializationContext(NbtOps.INSTANCE), tag
+            ).resultOrPartial()
         }
 
         fun parseOptional(lookupProvider: Provider, tag: CompoundTag): StorageFrequency {
@@ -92,7 +96,12 @@ private constructor(
     }
 
     fun save(lookupProvider: Provider, tag: Tag = CompoundTag()): Tag {
-        return CODEC.encodeStart(NbtOps.INSTANCE, this).resultOrPartial().getOrDefault(CompoundTag())
+        return CODEC.encodeStart(
+            lookupProvider.createSerializationContext(NbtOps.INSTANCE),
+            this
+        )
+            .resultOrPartial()
+            .getOrDefault(CompoundTag())
     }
 
     fun saveOptional(lookupProvider: Provider): Tag {

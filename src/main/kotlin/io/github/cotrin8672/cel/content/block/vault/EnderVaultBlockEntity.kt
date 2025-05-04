@@ -6,9 +6,7 @@ import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour
 import com.simibubi.create.foundation.blockEntity.behaviour.CenteredSideValueBoxTransform
 import io.github.cotrin8672.cel.content.SharedStorageBehaviour
 import io.github.cotrin8672.cel.registry.CelBlockEntityTypes
-import io.github.cotrin8672.cel.util.CelLang
 import io.github.cotrin8672.cel.util.SharedStorageHandler
-import net.minecraft.ChatFormatting
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerLevel
@@ -19,7 +17,6 @@ import net.neoforged.neoforge.capabilities.Capabilities
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent
 import net.neoforged.neoforge.items.IItemHandler
 import java.util.*
-import kotlin.jvm.optionals.getOrDefault
 
 class EnderVaultBlockEntity(
     type: BlockEntityType<*>,
@@ -62,43 +59,7 @@ class EnderVaultBlockEntity(
 
     override fun addToGoggleTooltip(tooltip: MutableList<Component>, isPlayerSneaking: Boolean): Boolean {
         super.addToGoggleTooltip(tooltip, isPlayerSneaking)
-        val behaviour = getBehaviour(SharedStorageBehaviour.TYPE)
-        val frequencyItem = behaviour.getFrequency().stack
-        val frequencyOwner = behaviour.getFrequency().resolvableProfile
-
-        val count = blockEntities.count {
-            behaviour.getFrequency() ==
-                    it.getBehaviour(SharedStorageBehaviour.TYPE).getFrequency()
-        }
-
-        CelLang.translate("gui.goggles.storage_stat").forGoggles(tooltip)
-
-        CelLang.translate("gui.goggles.frequency_scope")
-            .add(
-                if (behaviour.getFrequency().isGlobalScope)
-                    CelLang.translate("gui.goggles.scope_global").component()
-                else
-                    Component.literal(frequencyOwner.name.getOrDefault(""))
-            )
-            .style(ChatFormatting.YELLOW)
-            .forGoggles(tooltip)
-
-        CelLang.translate("gui.goggles.frequency_item")
-            .add(CelLang.itemName(frequencyItem))
-            .style(ChatFormatting.GREEN)
-            .forGoggles(tooltip)
-
-        CelLang.translate("gui.goggles.same_frequency_count")
-            .style(ChatFormatting.GRAY)
-            .forGoggles(tooltip)
-
-        CelLang.number(count.toDouble())
-            .space()
-            .translate(if (count > 1.0) "gui.goggles.block.plural" else "gui.goggles.block.singular")
-            .style(ChatFormatting.AQUA)
-            .space()
-            .add(CelLang.translate("gui.goggles.at_current_loading").style(ChatFormatting.DARK_GRAY))
-            .forGoggles(tooltip, 1)
+        getBehaviour(SharedStorageBehaviour.TYPE).addToGoggleTooltip(tooltip, isPlayerSneaking, blockEntities)
 
         return true
     }

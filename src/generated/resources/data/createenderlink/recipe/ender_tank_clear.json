@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "createenderlink:ender_tank"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "createenderlink:ender_tank"
+  }
+}
