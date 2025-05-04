@@ -36,8 +36,11 @@ private constructor(
     val isPersonalScope: Boolean
         get() = !isGlobalScope
 
-    private val isEmpty: Boolean
+    val isEmpty: Boolean
         get() = this == EMPTY
+
+    val isNotEmpty: Boolean
+        get() = !isEmpty
 
     val color by lazy {
         val displayTag = stack.getTagElement("display")
@@ -75,7 +78,7 @@ private constructor(
             val color = if (displayTag != null && displayTag.contains("color")) displayTag.getInt("color") else -1
 
             return storageFrequencies.computeIfAbsent(FrequencyKey(stack.item, color, gameProfile)) {
-                StorageFrequency(stack, gameProfile)
+                StorageFrequency(stack.item.defaultInstance, gameProfile)
             }
         }
 

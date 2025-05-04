@@ -62,7 +62,7 @@ class ScopeFilterMenu : GhostItemMenu<ItemStack> {
 
     override fun saveData(contentHolder: ItemStack) {
         val storageFrequency = contentHolder.storageFrequency.copy(
-            stack = ghostInventory.getStackInSlot(0)
+            stack = ghostInventory.getStackInSlot(0).item.defaultInstance
         )
 
         contentHolder.storageFrequency = storageFrequency

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "createenderlink:ender_vault"
+    }
+  ],
+  "result": {
+    "item": "createenderlink:ender_vault"
+  }
+}
