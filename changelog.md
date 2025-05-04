@@ -1,3 +1,3 @@
 ## Added
 
-- add ScopeFilter.
+- Added Frequency copy function.

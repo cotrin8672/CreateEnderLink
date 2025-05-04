@@ -30,5 +30,9 @@
   "createenderlink.ponder.ender_tank_sharing.text_2": "エンダータンクには周波数を設定するためのスロットがあります",
   "createenderlink.ponder.ender_tank_sharing.text_3": "スロットにアイテムを設定することで、周波数を決めることができます",
   "createenderlink.ponder.ender_tank_sharing.text_4": "同じ周波数を持つエンダータンクは内容物を共有します",
-  "createenderlink.ponder.ender_tank_sharing.text_5": "エンジニアのゴーグルを装着していると、現在リンクされているエンダータンクの数を確認できます"
+  "createenderlink.ponder.ender_tank_sharing.text_5": "エンジニアのゴーグルを装着していると、現在リンクされているエンダータンクの数を確認できます",
+  "createenderlink.storage_frequency.set": "周波数をコピーしました",
+  "createenderlink.storage_frequency.is_set": "周波数が設定されました",
+  "createenderlink.storage_frequency.craft_to_reset": "クラフトしてリセット",
+  "createenderlink.storage_frequency.not_holding_enough_scope_filter": "スコープフィルタが足りません"
 }

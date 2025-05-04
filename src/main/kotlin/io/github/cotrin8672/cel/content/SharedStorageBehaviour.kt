@@ -13,7 +13,11 @@ import io.github.cotrin8672.cel.registry.CelDataComponents
 import io.github.cotrin8672.cel.registry.CelItems
 import io.github.cotrin8672.cel.util.CelLang
 import io.github.cotrin8672.cel.util.StorageFrequency
+import io.github.cotrin8672.cel.util.use
 import net.createmod.catnip.math.VecHelper
+import net.minecraft.ChatFormatting
+import net.minecraft.client.gui.Font
+import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.core.Direction
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.component.DataComponents
@@ -29,6 +33,8 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
+import net.neoforged.neoforge.client.IItemDecorator
+import kotlin.jvm.optionals.getOrDefault
 import kotlin.math.max
 
 open class SharedStorageBehaviour(
@@ -37,6 +43,39 @@ open class SharedStorageBehaviour(
 ) : BlockEntityBehaviour(be), ValueSettingsBehaviour {
     companion object {
         val TYPE = BehaviourType<SharedStorageBehaviour>()
+
+        val DECORATOR = IItemDecorator { guiGraphics: GuiGraphics, font: Font, stack: ItemStack, x: Int, y: Int ->
+            val storageFrequency = stack.get(CelDataComponents.STORAGE_FREQUENCY)
+                ?: return@IItemDecorator false
+            val frequencyItem = storageFrequency.stack
+            if (frequencyItem.isEmpty) false
+            guiGraphics.pose().use {
+                val xOffset = x + 15f
+                val yOffset = y + 15f
+                translate(xOffset, yOffset, 0f)
+                scale(0.5f, 0.5f, 1f)
+                translate(-xOffset, -yOffset, 100f)
+                guiGraphics.renderItem(
+                    if (storageFrequency.isGlobalScope)
+                        storageFrequency.stack
+                    else
+                        CelItems.SCOPE_FILTER.asStack(), x, y
+                )
+
+                if (storageFrequency.isPersonalScope) {
+                    use {
+                        val xOffset = x + 8f
+                        val yOffset = y + 8f
+                        translate(xOffset, yOffset, 0f)
+                        scale(0.5f, 0.5f, 1f)
+                        translate(-xOffset, -yOffset, 10f)
+                        guiGraphics.renderItem(storageFrequency.stack, x, y)
+                    }
+                }
+            }
+
+            true
+        }
     }
 
     private var storageFrequency: StorageFrequency = StorageFrequency.EMPTY
@@ -104,6 +143,12 @@ open class SharedStorageBehaviour(
 
     open fun getRenderDistance(): Float {
         return AllConfigs.client().filterItemRenderDistance.f
+    }
+
+    fun setStorageFrequency(storageFrequency: StorageFrequency) {
+        this.storageFrequency = storageFrequency
+        blockEntity.setChanged()
+        blockEntity.sendData()
     }
 
     open fun setFrequencyItem(face: Direction?, stack: ItemStack): Boolean {
@@ -184,6 +229,48 @@ open class SharedStorageBehaviour(
             world.addFreshEntity(ItemEntity(world, pos.x, pos.y, pos.z, stack))
         }
         super.destroy()
+    }
+
+    fun addToGoggleTooltip(
+        tooltip: MutableList<Component>,
+        isPlayerSneaking: Boolean,
+        blockEntities: Set<SmartBlockEntity>,
+    ) {
+        val frequencyItem = getFrequency().stack
+        val frequencyOwner = getFrequency().resolvableProfile
+
+        val count = blockEntities.count {
+            getFrequency() == it.getBehaviour(SharedStorageBehaviour.TYPE).getFrequency()
+        }
+
+        CelLang.translate("gui.goggles.storage_stat").forGoggles(tooltip)
+
+        CelLang.translate("gui.goggles.frequency_scope")
+            .add(
+                if (getFrequency().isGlobalScope)
+                    CelLang.translate("gui.goggles.scope_global").component()
+                else
+                    Component.literal(frequencyOwner.name.getOrDefault(""))
+            )
+            .style(ChatFormatting.YELLOW)
+            .forGoggles(tooltip)
+
+        CelLang.translate("gui.goggles.frequency_item")
+            .add(CelLang.itemName(frequencyItem))
+            .style(ChatFormatting.GREEN)
+            .forGoggles(tooltip)
+
+        CelLang.translate("gui.goggles.same_frequency_count")
+            .style(ChatFormatting.GRAY)
+            .forGoggles(tooltip)
+
+        CelLang.number(count.toDouble())
+            .space()
+            .translate(if (count > 1.0) "gui.goggles.block.plural" else "gui.goggles.block.singular")
+            .style(ChatFormatting.AQUA)
+            .space()
+            .add(CelLang.translate("gui.goggles.at_current_loading").style(ChatFormatting.DARK_GRAY))
+            .forGoggles(tooltip, 1)
     }
 
     override fun setValueSettings(

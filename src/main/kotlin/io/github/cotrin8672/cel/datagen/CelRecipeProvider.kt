@@ -17,7 +17,7 @@ class CelRecipeProvider(
     registries: CompletableFuture<HolderLookup.Provider>,
 ) : RecipeProvider(output, registries) {
     override fun buildRecipes(recipeOutput: RecipeOutput) {
-        with(ShapedRecipeBuilder.shaped(RecipeCategory.MISC, CelBlocks.ENDER_VAULT.asItem())) {
+        with(ShapedRecipeBuilder.shaped(RecipeCategory.MISC, CelBlocks.ENDER_VAULT)) {
             pattern(" B ")
             pattern("EVE")
             pattern(" B ")
@@ -28,7 +28,13 @@ class CelRecipeProvider(
             save(recipeOutput)
         }
 
-        with(ShapedRecipeBuilder.shaped(RecipeCategory.MISC, CelBlocks.ENDER_TANK.asItem())) {
+        with(ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, CelBlocks.ENDER_VAULT)) {
+            requires(CelBlocks.ENDER_VAULT)
+            unlockedBy("has_ender_vault", has(CelBlocks.ENDER_VAULT))
+            save(recipeOutput, CreateEnderLink.asResource("ender_vault_clear"))
+        }
+
+        with(ShapedRecipeBuilder.shaped(RecipeCategory.MISC, CelBlocks.ENDER_TANK)) {
             pattern(" B ")
             pattern("ETE")
             pattern(" B ")
@@ -39,7 +45,13 @@ class CelRecipeProvider(
             save(recipeOutput)
         }
 
-        with(ShapedRecipeBuilder.shaped(RecipeCategory.MISC, CelItems.SCOPE_FILTER.asItem())) {
+        with(ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, CelBlocks.ENDER_TANK)) {
+            requires(CelBlocks.ENDER_TANK)
+            unlockedBy("has_ender_tank", has(CelBlocks.ENDER_TANK))
+            save(recipeOutput, CreateEnderLink.asResource("ender_tank_clear"))
+        }
+
+        with(ShapedRecipeBuilder.shaped(RecipeCategory.MISC, CelItems.SCOPE_FILTER)) {
             pattern("AWA")
             define('A', Items.AMETHYST_SHARD)
             define('W', ItemTags.WOOL)
