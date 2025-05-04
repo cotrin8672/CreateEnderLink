@@ -1,3 +1,3 @@
-## Fixed
+## Added
 
-- Fixed rendering issue.
+- Added Frequency copy function.
