@@ -40,10 +40,10 @@ open class SharedStorageBehaviour(
     companion object {
         val TYPE = BehaviourType<SharedStorageBehaviour>()
 
-        val DECORATOR = IItemDecorator { guiGraphics: GuiGraphics, font: Font, stack: ItemStack, x: Int, y: Int ->
+        val DECORATOR = IItemDecorator { guiGraphics: GuiGraphics, _: Font, stack: ItemStack, x: Int, y: Int ->
             val storageFrequency = stack.storageFrequency
             val frequencyItem = storageFrequency.stack
-            if (frequencyItem.isEmpty) false
+            if (frequencyItem.isEmpty) return@IItemDecorator false
             guiGraphics.pose().use {
                 val xOffset = x + 15f
                 val yOffset = y + 1f
@@ -59,11 +59,11 @@ open class SharedStorageBehaviour(
 
                 if (storageFrequency.isPersonalScope) {
                     use {
-                        val xOffset = x + 8f
-                        val yOffset = y + 8f
-                        translate(xOffset, yOffset, 0f)
+                        val scopeXOffset = x + 8f
+                        val scopeYOffset = y + 8f
+                        translate(scopeXOffset, scopeYOffset, 0f)
                         scale(0.5f, 0.5f, 1f)
-                        translate(-xOffset, -yOffset, 10f)
+                        translate(-scopeXOffset, -scopeYOffset, 10f)
                         guiGraphics.renderItem(storageFrequency.stack, x, y)
                     }
                 }
@@ -199,16 +199,17 @@ open class SharedStorageBehaviour(
     }
 
     open fun getLabel(): MutableComponent {
-        return CelLang.translate(
-            if (storageFrequency.stack.isEmpty && storageFrequency.isGlobalScope)
-                "tooltip.frequency.click_to_set"
-            else
-                "tooltip.frequency.click_to_replace"
-        ).component()
+        return CelLang.translate("tooltip.frequency.frequency").component()
     }
 
     open fun getTip(): MutableComponent {
-        return CelLang.translate(if (storageFrequency.stack.isEmpty) "tooltip.frequency.click_to_set" else "tooltip.frequency.click_to_replace")
+        return CelLang
+            .translate(
+                if (storageFrequency.stack.isEmpty)
+                    "tooltip.frequency.click_to_set"
+                else
+                    "tooltip.frequency.click_to_replace"
+            )
             .component()
     }
 

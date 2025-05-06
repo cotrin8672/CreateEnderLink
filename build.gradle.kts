@@ -113,7 +113,7 @@ dependencies {
 
 //    modCompileOnly("top.theillusivec4.curios:curios-forge:5.14.1+1.20.1:api")
 //    modRuntimeOnly("top.theillusivec4.curios:curios-forge:5.14.1+1.20.1")
-//    modRuntimeOnly(libs.jei)
+    modRuntimeOnly(libs.jei)
 }
 
 publisher {
