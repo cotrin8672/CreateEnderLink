@@ -1,5 +1,6 @@
 package io.github.cotrin8672.cel.content.item
 
+import com.google.common.collect.ImmutableList
 import com.simibubi.create.foundation.gui.AllGuiTextures
 import com.simibubi.create.foundation.gui.AllIcons
 import com.simibubi.create.foundation.gui.menu.AbstractSimiContainerScreen
@@ -7,6 +8,7 @@ import com.simibubi.create.foundation.gui.widget.IconButton
 import io.github.cotrin8672.cel.registry.CelGuiTextures
 import net.createmod.catnip.gui.element.GuiGameElement
 import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.renderer.Rect2i
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.player.Inventory
 import kotlin.math.max
@@ -17,6 +19,9 @@ class ScopeFilterScreen(
     title: Component,
 ) : AbstractSimiContainerScreen<ScopeFilterMenu>(container, inv, title) {
     private val background = CelGuiTextures.SCOPE_FILTER
+    private val extraIconAreas = ImmutableList.of(
+        Rect2i(leftPos + background.width, topPos + background.height - 25, 190, 60)
+    )
 
     override fun init() {
         setWindowSize(
@@ -61,5 +66,9 @@ class ScopeFilterScreen(
         )
             .scale(4.0)
             .render(graphics)
+    }
+
+    override fun getExtraAreas(): List<Rect2i> {
+        return extraIconAreas
     }
 }

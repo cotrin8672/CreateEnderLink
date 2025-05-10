@@ -4,6 +4,7 @@
   "createenderlink.tooltip.frequency.click_to_replace": "Click to replace",
   "block.createenderlink.ender_vault": "Ender Vault",
   "block.createenderlink.ender_tank": "Ender Tank",
+  "item.createenderlink.scope_filter": "Scope Filter",
   "item.createenderlink.scope_filter.tooltip.condition1": "When R-Clicked",
   "item.createenderlink.scope_filter.tooltip.behaviour1": "Opens the _configuration interface_.",
   "item.createenderlink.scope_filter.tooltip.summary": "Combine _player information_ with _an item_ to generate _a unique frequency_ and prevent _frequency collisions_ with other players.",
