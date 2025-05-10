@@ -13,11 +13,8 @@ import io.github.cotrin8672.cel.registry.CelItems
 import io.github.cotrin8672.cel.util.CelLang
 import io.github.cotrin8672.cel.util.StorageFrequency
 import io.github.cotrin8672.cel.util.storageFrequency
-import io.github.cotrin8672.cel.util.use
 import net.createmod.catnip.math.VecHelper
 import net.minecraft.ChatFormatting
-import net.minecraft.client.gui.Font
-import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.core.Direction
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
@@ -30,7 +27,6 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
-import net.minecraftforge.client.IItemDecorator
 import kotlin.math.max
 
 open class SharedStorageBehaviour(
@@ -39,38 +35,6 @@ open class SharedStorageBehaviour(
 ) : BlockEntityBehaviour(be), ValueSettingsBehaviour {
     companion object {
         val TYPE = BehaviourType<SharedStorageBehaviour>()
-
-        val DECORATOR = IItemDecorator { guiGraphics: GuiGraphics, font: Font, stack: ItemStack, x: Int, y: Int ->
-            val storageFrequency = stack.storageFrequency
-            val frequencyItem = storageFrequency.stack
-            if (frequencyItem.isEmpty) false
-            guiGraphics.pose().use {
-                val xOffset = x + 15f
-                val yOffset = y + 1f
-                translate(xOffset, yOffset, 0f)
-                scale(0.5f, 0.5f, 1f)
-                translate(-xOffset, -yOffset, 100f)
-                guiGraphics.renderItem(
-                    if (storageFrequency.isGlobalScope)
-                        storageFrequency.stack
-                    else
-                        CelItems.SCOPE_FILTER.asStack(), x, y
-                )
-
-                if (storageFrequency.isPersonalScope) {
-                    use {
-                        val xOffset = x + 8f
-                        val yOffset = y + 8f
-                        translate(xOffset, yOffset, 0f)
-                        scale(0.5f, 0.5f, 1f)
-                        translate(-xOffset, -yOffset, 10f)
-                        guiGraphics.renderItem(storageFrequency.stack, x, y)
-                    }
-                }
-            }
-
-            true
-        }
     }
 
     private var storageFrequency: StorageFrequency = StorageFrequency.EMPTY
@@ -199,16 +163,17 @@ open class SharedStorageBehaviour(
     }
 
     open fun getLabel(): MutableComponent {
-        return CelLang.translate(
-            if (storageFrequency.stack.isEmpty && storageFrequency.isGlobalScope)
-                "tooltip.frequency.click_to_set"
-            else
-                "tooltip.frequency.click_to_replace"
-        ).component()
+        return CelLang.translate("tooltip.frequency.frequency").component()
     }
 
     open fun getTip(): MutableComponent {
-        return CelLang.translate(if (storageFrequency.stack.isEmpty) "tooltip.frequency.click_to_set" else "tooltip.frequency.click_to_replace")
+        return CelLang
+            .translate(
+                if (storageFrequency.stack.isEmpty)
+                    "tooltip.frequency.click_to_set"
+                else
+                    "tooltip.frequency.click_to_replace"
+            )
             .component()
     }
 

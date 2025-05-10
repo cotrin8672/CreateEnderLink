@@ -18,7 +18,7 @@ import java.util.function.Supplier
 
 object CelBlocks {
     val ENDER_VAULT: BlockEntry<EnderVaultBlock> = REGISTRATE
-        .block("ender_vault", ::EnderVaultBlock)
+        .block<EnderVaultBlock>("ender_vault", ::EnderVaultBlock)
         .initialProperties(SharedProperties::softMetal)
         .properties {
             it
@@ -34,10 +34,13 @@ object CelBlocks {
         .register()
 
     val ENDER_TANK: BlockEntry<EnderTankBlock> = REGISTRATE
-        .block("ender_tank", ::EnderTankBlock)
+        .block<EnderTankBlock>("ender_tank", ::EnderTankBlock)
         .initialProperties(SharedProperties::copperMetal)
         .properties {
-            it.noOcclusion().isRedstoneConductor { _, _, _ -> true }
+            it
+                .noOcclusion()
+                .isRedstoneConductor { _, _, _ -> true }
+                .explosionResistance(1200f)
         }
         .transform(pickaxeOnly())
         .blockstate { c, p -> p.simpleBlock(c.get(), AssetLookup.standardModel(c, p)) }
