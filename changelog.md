@@ -1,3 +1,3 @@
-## Added
+## Fixed
 
-- Added Frequency copy function.
+- Fixed issue#23
