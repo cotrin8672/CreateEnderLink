@@ -9,12 +9,13 @@ import io.github.cotrin8672.cel.util.use
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.world.item.ItemStack
+import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.client.IItemDecorator
 import net.minecraftforge.client.event.RegisterItemDecorationsEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod
 
-@Mod.EventBusSubscriber(modid = CreateEnderLink.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = CreateEnderLink.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = [Dist.CLIENT])
 object ClientEvents {
     @SubscribeEvent
     fun onRegisterItemDecoration(event: RegisterItemDecorationsEvent) {
