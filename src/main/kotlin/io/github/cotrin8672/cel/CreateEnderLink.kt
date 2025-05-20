@@ -6,12 +6,9 @@ import com.simibubi.create.foundation.item.KineticStats
 import com.simibubi.create.foundation.item.TooltipModifier
 import io.github.cotrin8672.cel.content.ponder.CelPonderPlugin
 import io.github.cotrin8672.cel.datagen.CelDatagen
+import io.github.cotrin8672.cel.network.CelNetworking
 import io.github.cotrin8672.cel.registrate.KotlinRegistrate
-import io.github.cotrin8672.cel.registry.CelBlockEntityTypes
-import io.github.cotrin8672.cel.registry.CelBlocks
-import io.github.cotrin8672.cel.registry.CelCreativeModeTabs
-import io.github.cotrin8672.cel.registry.CelItems
-import io.github.cotrin8672.cel.registry.CelMenuTypes
+import io.github.cotrin8672.cel.registry.*
 import net.createmod.catnip.lang.FontHelper
 import net.createmod.ponder.foundation.PonderIndex
 import net.minecraft.resources.ResourceLocation
@@ -19,6 +16,7 @@ import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.eventbus.api.EventPriority
 import net.minecraftforge.fml.DistExecutor
 import net.minecraftforge.fml.common.Mod
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent
 import thedarkcolour.kotlinforforge.forge.MOD_BUS
 
 @Mod.EventBusSubscriber(modid = CreateEnderLink.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -45,8 +43,15 @@ object CreateEnderLink {
         CelBlockEntityTypes.register()
         CelMenuTypes.register()
         MOD_BUS.addListener(EventPriority.LOWEST, CelDatagen::gatherData)
+        MOD_BUS.addListener(this::onCommonSetup)
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT) {
             Runnable { PonderIndex.addPlugin(CelPonderPlugin) }
+        }
+    }
+
+    fun onCommonSetup(event: FMLCommonSetupEvent) {
+        event.enqueueWork {
+            CelNetworking.registerPacket()
         }
     }
 }

@@ -1,11 +1,15 @@
 package io.github.cotrin8672.cel.content.storage
 
 import io.github.cotrin8672.cel.content.block.tank.EnderTankBlockEntity
+import io.github.cotrin8672.cel.network.CelNetworking
+import io.github.cotrin8672.cel.network.SyncSharedStoragePacket
 import io.github.cotrin8672.cel.util.SharedStorageHandler
 import net.createmod.catnip.animation.LerpedFloat
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.server.level.ServerLevel
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.templates.FluidTank
+import net.minecraftforge.network.PacketDistributor
 
 class SharedFluidTank(capacity: Int, private val handler: SharedStorageHandler?) : FluidTank(capacity) {
     var fluidLevel: LerpedFloat? = null
@@ -50,6 +54,18 @@ class SharedFluidTank(capacity: Int, private val handler: SharedStorageHandler?)
         val luminosity = (attributes.getLightLevel(newFluidStack) / 1.2f).toInt()
         val reversed = attributes.isLighterThanAir
         val maxY = ((getFillState() * 1) + 1).toInt()
+
+        val anyBe = EnderTankBlockEntity.getLoadingBlockEntities().firstOrNull()
+        val level = anyBe?.level
+        if (level is ServerLevel) {
+            val nbt = SharedStorageHandler.instance?.save(CompoundTag()) ?: return
+            for (player in level.players()) {
+                CelNetworking.CHANNEL.send(
+                    PacketDistributor.PLAYER.with { player },
+                    SyncSharedStoragePacket(nbt)
+                )
+            }
+        }
 
         for (be in EnderTankBlockEntity.getLoadingBlockEntities()) {
             if (!be.hasLevel()) continue

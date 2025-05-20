@@ -1,6 +1,5 @@
 package io.github.cotrin8672.cel.util
 
-import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler.Frequency
 import io.github.cotrin8672.cel.content.storage.SharedFluidTank
 import io.github.cotrin8672.cel.content.storage.SharedItemStackHandler
 import net.minecraft.nbt.CompoundTag
@@ -105,7 +104,7 @@ class SharedStorageHandler : SavedData() {
                 }
                 sharedFluidStorage[frequency] = fluidTank
             } else if (item.contains("StorageFrequency", Tag.TAG_COMPOUND.toInt())) {
-                val storageFrequency = StorageFrequency.parseOptional( item.getCompound("StorageFrequency"))
+                val storageFrequency = StorageFrequency.parseOptional(item.getCompound("StorageFrequency"))
                 val fluidTank = SharedFluidTank(10000, this).apply {
                     readFromNBT(item.getCompound("Tank"))
                 }
