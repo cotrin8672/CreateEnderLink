@@ -7,6 +7,7 @@ import com.simibubi.create.foundation.blockEntity.behaviour.CenteredSideValueBox
 import io.github.cotrin8672.cel.content.SharedStorageBehaviour
 import io.github.cotrin8672.cel.registry.CelBlockEntityTypes
 import io.github.cotrin8672.cel.util.SharedStorageHandler
+import io.github.cotrin8672.cel.util.LinkCountManager
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerLevel
@@ -41,6 +42,8 @@ class EnderVaultBlockEntity(
         if (!isAlreadyExists) blockEntities.add(this)
     }
 
+    private var firstTick = true
+
     private fun getInventory(): IItemHandler? {
         val behaviour = getBehaviour(SharedStorageBehaviour.TYPE) ?: return null
         val nonNullLevel = level ?: return null
@@ -57,9 +60,17 @@ class EnderVaultBlockEntity(
         }))
     }
 
+    override fun tick() {
+        super.tick()
+        if (firstTick && level is ServerLevel) {
+            firstTick = false
+            LinkCountManager.sync(level as ServerLevel)
+        }
+    }
+
     override fun addToGoggleTooltip(tooltip: MutableList<Component>, isPlayerSneaking: Boolean): Boolean {
         super.addToGoggleTooltip(tooltip, isPlayerSneaking)
-        getBehaviour(SharedStorageBehaviour.TYPE).addToGoggleTooltip(tooltip, isPlayerSneaking, blockEntities)
+        getBehaviour(SharedStorageBehaviour.TYPE).addToGoggleTooltip(tooltip, isPlayerSneaking)
 
         return true
     }
@@ -67,15 +78,18 @@ class EnderVaultBlockEntity(
     override fun destroy() {
         super.destroy()
         blockEntities.remove(this)
+        if (level is ServerLevel) LinkCountManager.sync(level as ServerLevel)
     }
 
     override fun remove() {
         super.remove()
         blockEntities.remove(this)
+        if (level is ServerLevel) LinkCountManager.sync(level as ServerLevel)
     }
 
     override fun onChunkUnloaded() {
         super.onChunkUnloaded()
         blockEntities.remove(this)
+        if (level is ServerLevel) LinkCountManager.sync(level as ServerLevel)
     }
 }

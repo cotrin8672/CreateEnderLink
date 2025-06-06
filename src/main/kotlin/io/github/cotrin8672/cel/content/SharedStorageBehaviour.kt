@@ -8,6 +8,8 @@ import com.simibubi.create.foundation.blockEntity.SmartBlockEntity
 import com.simibubi.create.foundation.blockEntity.behaviour.*
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueSettingsBehaviour.ValueSettings
 import com.simibubi.create.foundation.utility.CreateLang
+import LinkCountManager
+import ServerLevel
 import com.simibubi.create.infrastructure.config.AllConfigs
 import io.github.cotrin8672.cel.registry.CelDataComponents
 import io.github.cotrin8672.cel.registry.CelItems
@@ -109,9 +111,13 @@ open class SharedStorageBehaviour(
     }
 
     fun setStorageFrequency(storageFrequency: StorageFrequency) {
+        val old = this.storageFrequency
         this.storageFrequency = storageFrequency
         blockEntity.setChanged()
         blockEntity.sendData()
+        if (blockEntity.level is ServerLevel && old != storageFrequency) {
+            LinkCountManager.sync(blockEntity.level as ServerLevel)
+        }
     }
 
     open fun setFrequencyItem(face: Direction?, stack: ItemStack): Boolean {
@@ -197,14 +203,10 @@ open class SharedStorageBehaviour(
     fun addToGoggleTooltip(
         tooltip: MutableList<Component>,
         isPlayerSneaking: Boolean,
-        blockEntities: Set<SmartBlockEntity>,
     ) {
         val frequencyItem = getFrequency().stack
         val frequencyOwner = getFrequency().resolvableProfile
-
-        val count = blockEntities.count {
-            getFrequency() == it.getBehaviour(SharedStorageBehaviour.TYPE).getFrequency()
-        }
+        val count = io.github.cotrin8672.cel.client.LinkCountClient.getCount(blockEntity, getFrequency())
 
         CelLang.translate("gui.goggles.storage_stat").forGoggles(tooltip)
 

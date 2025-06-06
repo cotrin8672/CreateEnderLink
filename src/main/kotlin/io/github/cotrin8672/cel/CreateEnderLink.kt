@@ -8,6 +8,8 @@ import io.github.cotrin8672.cel.content.block.tank.EnderTankBlockEntity
 import io.github.cotrin8672.cel.content.block.vault.EnderVaultBlockEntity
 import io.github.cotrin8672.cel.datagen.CelDatagen
 import io.github.cotrin8672.cel.network.SyncSharedStoragePacket
+import io.github.cotrin8672.cel.network.SyncFrequencyCountPacket
+import io.github.cotrin8672.cel.client.LinkCountClient
 import io.github.cotrin8672.cel.registry.*
 import io.github.cotrin8672.cel.util.SharedStorageHandler
 import net.createmod.catnip.lang.FontHelper
@@ -63,6 +65,15 @@ object CreateEnderLink {
             context.enqueueWork {
                 val level = context.player().level()
                 SharedStorageHandler.instance = SharedStorageHandler.load(packet.data, level.registryAccess())
+            }
+        }
+        registrar.playBidirectional(
+            SyncFrequencyCountPacket.TYPE,
+            SyncFrequencyCountPacket.STREAM_CODEC,
+        ) { packet, context ->
+            context.enqueueWork {
+                val level = context.player().level()
+                LinkCountClient.update(packet.data, level.registryAccess())
             }
         }
     }

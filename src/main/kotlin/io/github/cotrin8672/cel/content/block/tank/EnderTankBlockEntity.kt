@@ -8,6 +8,7 @@ import io.github.cotrin8672.cel.content.SharedStorageBehaviour
 import io.github.cotrin8672.cel.content.storage.SharedFluidTank
 import io.github.cotrin8672.cel.registry.CelBlockEntityTypes
 import io.github.cotrin8672.cel.util.SharedStorageHandler
+import io.github.cotrin8672.cel.util.LinkCountManager
 import net.createmod.ponder.api.level.PonderLevel
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -39,12 +40,14 @@ class EnderTankBlockEntity(
         private val blockEntities: MutableSet<EnderTankBlockEntity> = Collections.newSetFromMap(WeakHashMap())
 
         fun getLoadingBlockEntities(): Set<EnderTankBlockEntity> = blockEntities.toSet()
-    }
+    } 
 
     init {
         val isAlreadyExists = blockEntities.map { it.blockPos }.contains(this.blockPos)
         if (!isAlreadyExists) blockEntities.add(this)
     }
+
+    private var firstTick = true
 
     private var luminosity = 0
     private var queuedSync = false
@@ -77,6 +80,11 @@ class EnderTankBlockEntity(
     override fun tick() {
         super.tick()
 
+        if (firstTick && level is ServerLevel) {
+            firstTick = false
+            LinkCountManager.sync(level as ServerLevel)
+        }
+
         if (syncCooldown > 0) {
             syncCooldown--
             if (syncCooldown == 0 && queuedSync) sendData()
@@ -92,7 +100,7 @@ class EnderTankBlockEntity(
         )
         tooltip.add(CommonComponents.EMPTY)
 
-        getBehaviour(SharedStorageBehaviour.TYPE).addToGoggleTooltip(tooltip, isPlayerSneaking, blockEntities)
+        getBehaviour(SharedStorageBehaviour.TYPE).addToGoggleTooltip(tooltip, isPlayerSneaking)
 
         return true
     }
@@ -100,16 +108,19 @@ class EnderTankBlockEntity(
     override fun destroy() {
         super.destroy()
         blockEntities.remove(this)
+        if (level is ServerLevel) LinkCountManager.sync(level as ServerLevel)
     }
 
     override fun remove() {
         super.remove()
         blockEntities.remove(this)
+        if (level is ServerLevel) LinkCountManager.sync(level as ServerLevel)
     }
 
     override fun onChunkUnloaded() {
         super.onChunkUnloaded()
         blockEntities.remove(this)
+        if (level is ServerLevel) LinkCountManager.sync(level as ServerLevel)
     }
 
     override fun sendData() {
