@@ -19,6 +19,7 @@ import net.minecraft.core.Direction
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.InteractionHand
@@ -111,6 +112,14 @@ open class SharedStorageBehaviour(
     }
 
     open fun setFrequencyItem(stack: ItemStack): Boolean {
+        val level = blockEntity.level
+        if (level is ServerLevel) {
+//            CelNetworking.CHANNEL.send(
+//                PacketDistributor.PLAYER.noArg(),
+//                LinkedBlockCountPacket(storageFrequency, -1)
+//            )
+        }
+
         storageFrequency = if (CelItems.SCOPE_FILTER.isIn(stack)) {
             if (stack.storageFrequency.isPersonalScope) {
                 stack.storageFrequency
@@ -122,6 +131,7 @@ open class SharedStorageBehaviour(
         }
         blockEntity.setChanged()
         blockEntity.sendData()
+
         return true
     }
 
@@ -192,14 +202,10 @@ open class SharedStorageBehaviour(
     fun addToGoggleTooltip(
         tooltip: MutableList<Component>,
         isPlayerSneaking: Boolean,
-        blockEntities: Set<SmartBlockEntity>,
+        count: Int,
     ): Boolean {
         val frequencyItem = this.getFrequency().stack
         val frequencyOwner = this.getFrequency().gameProfile
-
-        val count = blockEntities.count {
-            getFrequency() == it.getBehaviour(TYPE).getFrequency()
-        }
 
         CelLang.translate("gui.goggles.storage_stat").forGoggles(tooltip)
 

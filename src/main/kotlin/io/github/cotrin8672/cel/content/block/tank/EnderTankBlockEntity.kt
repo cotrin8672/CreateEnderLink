@@ -6,6 +6,8 @@ import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour
 import com.simibubi.create.foundation.blockEntity.behaviour.CenteredSideValueBoxTransform
 import io.github.cotrin8672.cel.content.SharedStorageBehaviour
 import io.github.cotrin8672.cel.content.storage.SharedFluidTank
+import io.github.cotrin8672.cel.registry.CelBlocks
+import io.github.cotrin8672.cel.util.LinkedCountManager
 import io.github.cotrin8672.cel.util.SharedStorageHandler
 import net.createmod.ponder.api.level.PonderLevel
 import net.minecraft.core.BlockPos
@@ -19,7 +21,6 @@ import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.common.capabilities.ForgeCapabilities
 import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.fluids.capability.IFluidHandler
-import java.util.*
 import javax.annotation.Nonnull
 
 class EnderTankBlockEntity(
@@ -27,15 +28,8 @@ class EnderTankBlockEntity(
     pos: BlockPos,
     state: BlockState,
 ) : SmartBlockEntity(type, pos, state), IHaveGoggleInformation {
-    companion object {
-        private val blockEntities: MutableSet<EnderTankBlockEntity> = Collections.newSetFromMap(WeakHashMap())
-
-        fun getLoadingBlockEntities(): Set<EnderTankBlockEntity> = blockEntities.toSet()
-    }
-
     init {
-        val isAlreadyExists = blockEntities.map { it.blockPos }.contains(this.blockPos)
-        if (!isAlreadyExists) blockEntities.add(this)
+        LinkedCountManager.addLinkedBlock(CelBlocks.ENDER_TANK.key, this)
     }
 
     private var luminosity = 0
@@ -91,23 +85,28 @@ class EnderTankBlockEntity(
 
         tooltip.add(CommonComponents.EMPTY)
 
-        getBehaviour(SharedStorageBehaviour.TYPE).addToGoggleTooltip(tooltip, isPlayerSneaking, blockEntities)
+        val behaviour = getBehaviour(SharedStorageBehaviour.TYPE)
+        getBehaviour(SharedStorageBehaviour.TYPE).addToGoggleTooltip(
+            tooltip,
+            isPlayerSneaking,
+            LinkedCountManager.getLinkedCount(CelBlocks.ENDER_TANK.key, behaviour.getFrequency())
+        )
         return true
     }
 
     override fun destroy() {
         super.destroy()
-        blockEntities.remove(this)
+        LinkedCountManager.removeLinkedBlock(CelBlocks.ENDER_TANK.key, this)
     }
 
     override fun remove() {
         super.remove()
-        blockEntities.remove(this)
+        LinkedCountManager.removeLinkedBlock(CelBlocks.ENDER_TANK.key, this)
     }
 
     override fun onChunkUnloaded() {
         super.onChunkUnloaded()
-        blockEntities.remove(this)
+        LinkedCountManager.removeLinkedBlock(CelBlocks.ENDER_TANK.key, this)
     }
 
     override fun sendData() {

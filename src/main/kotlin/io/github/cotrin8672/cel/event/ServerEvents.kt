@@ -2,11 +2,16 @@ package io.github.cotrin8672.cel.event
 
 import io.github.cotrin8672.cel.CreateEnderLink
 import io.github.cotrin8672.cel.network.CelNetworking
+import io.github.cotrin8672.cel.network.FullLinkedCountPacket
 import io.github.cotrin8672.cel.network.SyncSharedStoragePacket
+import io.github.cotrin8672.cel.registry.CelBlocks
+import io.github.cotrin8672.cel.util.LinkedCountManager
 import io.github.cotrin8672.cel.util.SharedStorageHandler
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerPlayer
 import net.minecraftforge.event.entity.player.PlayerEvent
+import net.minecraftforge.event.server.ServerStartedEvent
+import net.minecraftforge.event.server.ServerStoppedEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber
 import net.minecraftforge.network.PacketDistributor
@@ -21,5 +26,21 @@ object ServerEvents {
             PacketDistributor.PLAYER.with { event.entity as ServerPlayer },
             SyncSharedStoragePacket(nbt)
         )
+
+        CelNetworking.CHANNEL.send(
+            PacketDistributor.PLAYER.with { event.entity as ServerPlayer },
+            FullLinkedCountPacket(LinkedCountManager.getFullLinkedCount())
+        )
+    }
+
+    @SubscribeEvent
+    fun onServerStarted(event: ServerStartedEvent) {
+        LinkedCountManager.registerLinkableBlock(CelBlocks.ENDER_VAULT)
+        LinkedCountManager.registerLinkableBlock(CelBlocks.ENDER_TANK)
+    }
+
+    @SubscribeEvent
+    fun onServerStopped(event: ServerStoppedEvent) {
+        LinkedCountManager.clearAll()
     }
 }

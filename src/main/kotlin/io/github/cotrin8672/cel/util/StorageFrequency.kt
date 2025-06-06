@@ -6,7 +6,6 @@ import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.core.UUIDUtil
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.nbt.Tag
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import java.util.*
@@ -104,7 +103,7 @@ private constructor(
         }
     }
 
-    fun saveOptional(): Tag {
+    fun saveOptional(): CompoundTag {
         return CompoundTag().apply {
             put("ItemStack", stack.serializeNBT())
             put("GameProfile", serializeGameProfile(gameProfile))
