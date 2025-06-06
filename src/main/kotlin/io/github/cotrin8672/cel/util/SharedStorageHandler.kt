@@ -12,6 +12,7 @@ import net.minecraft.world.level.saveddata.SavedData
 class SharedStorageHandler : SavedData() {
     private val sharedItemStorage = mutableMapOf<StorageFrequency, SharedItemStackHandler>()
     private val sharedFluidStorage = mutableMapOf<StorageFrequency, SharedFluidTank>()
+    private val frequencyCounts = mutableMapOf<StorageFrequency, Int>()
 
     companion object {
         fun create() = SharedStorageHandler()
@@ -39,6 +40,23 @@ class SharedStorageHandler : SavedData() {
         }
     }
 
+    fun incrementFrequency(frequency: StorageFrequency) {
+        if (frequency.isEmpty) return
+        frequencyCounts[frequency] = getFrequencyCount(frequency) + 1
+        setDirty()
+    }
+
+    fun decrementFrequency(frequency: StorageFrequency) {
+        if (frequency.isEmpty) return
+        val current = frequencyCounts[frequency] ?: 0
+        if (current <= 1) frequencyCounts.remove(frequency) else frequencyCounts[frequency] = current - 1
+        setDirty()
+    }
+
+    fun getFrequencyCount(frequency: StorageFrequency): Int {
+        return frequencyCounts[frequency] ?: 0
+    }
+
     override fun save(tag: CompoundTag, registries: Provider): CompoundTag {
         val vaultFrequencies = sharedItemStorage.keys
         val listTag = ListTag()
@@ -61,6 +79,16 @@ class SharedStorageHandler : SavedData() {
             fluidListTag.add(pairTag)
         }
         tag.put("SharedFluidStorage", fluidListTag)
+
+        val countListTag = ListTag()
+        for ((frequency, count) in frequencyCounts) {
+            val pairTag = CompoundTag().apply {
+                put("StorageFrequency", frequency.saveOptional(registries))
+                putInt("Count", count)
+            }
+            countListTag.add(pairTag)
+        }
+        tag.put("FrequencyCounts", countListTag)
 
         return tag
     }
@@ -109,6 +137,16 @@ class SharedStorageHandler : SavedData() {
                 }
 
                 sharedFluidStorage[storageFrequency] = fluidTank
+            }
+        }
+
+        val countList = tag.getList("FrequencyCounts", Tag.TAG_COMPOUND.toInt())
+        for (item in countList.asIterable()) {
+            if (item !is CompoundTag) continue
+            val storageFrequency = StorageFrequency.parseOptional(registries, item.getCompound("StorageFrequency"))
+            val count = item.getInt("Count")
+            if (storageFrequency.isNotEmpty) {
+                frequencyCounts[storageFrequency] = count
             }
         }
 

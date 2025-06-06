@@ -15,10 +15,13 @@ import net.minecraft.core.HolderLookup
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.CommonComponents
 import net.minecraft.network.chat.Component
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
 import net.neoforged.neoforge.capabilities.Capabilities
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent
+import net.neoforged.neoforge.network.PacketDistributor
+import io.github.cotrin8672.cel.network.SyncSharedStoragePacket
 import java.util.*
 
 class EnderTankBlockEntity(
@@ -35,15 +38,6 @@ class EnderTankBlockEntity(
                 return@registerBlockEntity be.getFluidTank()
             }
         }
-
-        private val blockEntities: MutableSet<EnderTankBlockEntity> = Collections.newSetFromMap(WeakHashMap())
-
-        fun getLoadingBlockEntities(): Set<EnderTankBlockEntity> = blockEntities.toSet()
-    }
-
-    init {
-        val isAlreadyExists = blockEntities.map { it.blockPos }.contains(this.blockPos)
-        if (!isAlreadyExists) blockEntities.add(this)
     }
 
     private var luminosity = 0
@@ -58,6 +52,9 @@ class EnderTankBlockEntity(
         }
         val behaviour = getBehaviour(SharedStorageBehaviour.TYPE) ?: return null
         val fluidTank = SharedStorageHandler.instance?.getOrCreateSharedFluidStorage(behaviour.getFrequency())
+        if (level is ServerLevel) {
+            fluidTank?.serverLevel = level as ServerLevel
+        }
         return fluidTank
     }
 
@@ -65,6 +62,11 @@ class EnderTankBlockEntity(
         behaviours.add(SharedStorageBehaviour(this, CenteredSideValueBoxTransform { _, direction ->
             direction.axis == Direction.Axis.Y
         }))
+    }
+
+    override fun onLoad() {
+        super.onLoad()
+        updateFrequencyCount(1)
     }
 
     fun setLuminosity(luminosity: Int) {
@@ -92,24 +94,24 @@ class EnderTankBlockEntity(
         )
         tooltip.add(CommonComponents.EMPTY)
 
-        getBehaviour(SharedStorageBehaviour.TYPE).addToGoggleTooltip(tooltip, isPlayerSneaking, blockEntities)
+        getBehaviour(SharedStorageBehaviour.TYPE).addToGoggleTooltip(tooltip, isPlayerSneaking)
 
         return true
     }
 
     override fun destroy() {
         super.destroy()
-        blockEntities.remove(this)
+        updateFrequencyCount(-1)
     }
 
     override fun remove() {
         super.remove()
-        blockEntities.remove(this)
+        updateFrequencyCount(-1)
     }
 
     override fun onChunkUnloaded() {
         super.onChunkUnloaded()
-        blockEntities.remove(this)
+        updateFrequencyCount(-1)
     }
 
     override fun sendData() {
@@ -120,6 +122,16 @@ class EnderTankBlockEntity(
         super.sendData()
         queuedSync = false
         syncCooldown = 8
+    }
+
+    private fun updateFrequencyCount(delta: Int) {
+        if (level is ServerLevel) {
+            val freq = getBehaviour(SharedStorageBehaviour.TYPE).getFrequency()
+            val handler = SharedStorageHandler.instance ?: return
+            if (delta > 0) handler.incrementFrequency(freq) else handler.decrementFrequency(freq)
+            val nbt = handler.save(CompoundTag(), (level as ServerLevel).registryAccess())
+            PacketDistributor.sendToAllPlayers(SyncSharedStoragePacket(nbt))
+        }
     }
 
     override fun read(tag: CompoundTag, registries: HolderLookup.Provider, clientPacket: Boolean) {

@@ -1,6 +1,5 @@
 package io.github.cotrin8672.cel.content.storage
 
-import io.github.cotrin8672.cel.content.block.tank.EnderTankBlockEntity
 import io.github.cotrin8672.cel.network.SyncSharedStoragePacket
 import io.github.cotrin8672.cel.util.SharedStorageHandler
 import net.createmod.catnip.animation.LerpedFloat
@@ -14,6 +13,7 @@ import net.neoforged.neoforge.network.PacketDistributor
 class SharedFluidTank(capacity: Int, private val handler: SharedStorageHandler?) : FluidTank(capacity) {
     var fluidLevel: LerpedFloat? = null
     var forceFluidLevelUpdate = true
+    var serverLevel: ServerLevel? = null
 
     override fun onContentsChanged() {
         super.onContentsChanged()
@@ -56,29 +56,10 @@ class SharedFluidTank(capacity: Int, private val handler: SharedStorageHandler?)
         val reversed = attributes.isLighterThanAir
         val maxY = ((getFillState() * 1) + 1).toInt()
 
-        val anyBe = EnderTankBlockEntity.getLoadingBlockEntities().firstOrNull()
-        val level = anyBe?.level
-        if (level is ServerLevel) {
+        val level = serverLevel
+        if (level != null) {
             val nbt = SharedStorageHandler.instance?.save(CompoundTag(), level.registryAccess()) ?: return
             PacketDistributor.sendToAllPlayers(SyncSharedStoragePacket(nbt))
-        }
-
-
-        for (be in EnderTankBlockEntity.getLoadingBlockEntities()) {
-            if (!be.hasLevel()) continue
-
-            val isBright = if (reversed) (1 <= maxY) else (0 < maxY)
-            val actualLuminosity = if (isBright) luminosity else if (luminosity > 0) 1 else 0
-
-            val pos = be.blockPos
-            be.level?.updateNeighbourForOutputSignal(pos, be.blockState.block)
-            if (luminosity == actualLuminosity) continue
-            be.setLuminosity(actualLuminosity)
-
-            if (!be.level!!.isClientSide) {
-                be.setChanged()
-                be.sendData()
-            }
         }
 
         if (fluidLevel == null) {

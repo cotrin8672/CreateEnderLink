@@ -10,12 +10,15 @@ import io.github.cotrin8672.cel.util.SharedStorageHandler
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.neoforged.neoforge.capabilities.Capabilities
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent
 import net.neoforged.neoforge.items.IItemHandler
+import net.neoforged.neoforge.network.PacketDistributor
+import io.github.cotrin8672.cel.network.SyncSharedStoragePacket
 import java.util.*
 
 class EnderVaultBlockEntity(
@@ -33,12 +36,6 @@ class EnderVaultBlockEntity(
             }
         }
 
-        private val blockEntities: MutableSet<EnderVaultBlockEntity> = Collections.newSetFromMap(WeakHashMap())
-    }
-
-    init {
-        val isAlreadyExists = blockEntities.map { it.blockPos }.contains(this.blockPos)
-        if (!isAlreadyExists) blockEntities.add(this)
     }
 
     private fun getInventory(): IItemHandler? {
@@ -57,25 +54,40 @@ class EnderVaultBlockEntity(
         }))
     }
 
+    override fun onLoad() {
+        super.onLoad()
+        updateFrequencyCount(1)
+    }
+
     override fun addToGoggleTooltip(tooltip: MutableList<Component>, isPlayerSneaking: Boolean): Boolean {
         super.addToGoggleTooltip(tooltip, isPlayerSneaking)
-        getBehaviour(SharedStorageBehaviour.TYPE).addToGoggleTooltip(tooltip, isPlayerSneaking, blockEntities)
+        getBehaviour(SharedStorageBehaviour.TYPE).addToGoggleTooltip(tooltip, isPlayerSneaking)
 
         return true
     }
 
     override fun destroy() {
         super.destroy()
-        blockEntities.remove(this)
+        updateFrequencyCount(-1)
     }
 
     override fun remove() {
         super.remove()
-        blockEntities.remove(this)
+        updateFrequencyCount(-1)
     }
 
     override fun onChunkUnloaded() {
         super.onChunkUnloaded()
-        blockEntities.remove(this)
+        updateFrequencyCount(-1)
+    }
+
+    private fun updateFrequencyCount(delta: Int) {
+        if (level is ServerLevel) {
+            val freq = getBehaviour(SharedStorageBehaviour.TYPE).getFrequency()
+            val handler = SharedStorageHandler.instance ?: return
+            if (delta > 0) handler.incrementFrequency(freq) else handler.decrementFrequency(freq)
+            val nbt = handler.save(CompoundTag(), (level as ServerLevel).registryAccess())
+            PacketDistributor.sendToAllPlayers(SyncSharedStoragePacket(nbt))
+        }
     }
 }

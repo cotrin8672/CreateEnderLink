@@ -12,6 +12,7 @@ import com.simibubi.create.infrastructure.config.AllConfigs
 import io.github.cotrin8672.cel.registry.CelDataComponents
 import io.github.cotrin8672.cel.registry.CelItems
 import io.github.cotrin8672.cel.util.CelLang
+import io.github.cotrin8672.cel.util.SharedStorageHandler
 import io.github.cotrin8672.cel.util.StorageFrequency
 import net.createmod.catnip.math.VecHelper
 import net.minecraft.ChatFormatting
@@ -30,6 +31,9 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
+import net.minecraft.server.level.ServerLevel
+import net.neoforged.neoforge.network.PacketDistributor
+import io.github.cotrin8672.cel.network.SyncSharedStoragePacket
 import kotlin.jvm.optionals.getOrDefault
 import kotlin.math.max
 
@@ -109,6 +113,16 @@ open class SharedStorageBehaviour(
     }
 
     fun setStorageFrequency(storageFrequency: StorageFrequency) {
+        if (blockEntity.level is ServerLevel) {
+            val handler = SharedStorageHandler.instance
+            handler?.decrementFrequency(this.storageFrequency)
+            handler?.incrementFrequency(storageFrequency)
+            val level = blockEntity.level as ServerLevel
+            val nbt = handler?.save(CompoundTag(), level.registryAccess())
+            if (nbt != null) {
+                PacketDistributor.sendToAllPlayers(SyncSharedStoragePacket(nbt))
+            }
+        }
         this.storageFrequency = storageFrequency
         blockEntity.setChanged()
         blockEntity.sendData()
@@ -120,13 +134,12 @@ open class SharedStorageBehaviour(
 
     open fun setFrequencyItem(stack: ItemStack): Boolean {
         val filter = stack.copy()
-        storageFrequency = if (filter.`is`(CelItems.SCOPE_FILTER)) {
+        val newFrequency = if (filter.`is`(CelItems.SCOPE_FILTER)) {
             stack.get(CelDataComponents.STORAGE_FREQUENCY) ?: StorageFrequency.of(filter)
         } else {
             StorageFrequency.of(filter)
         }
-        blockEntity.setChanged()
-        blockEntity.sendData()
+        setStorageFrequency(newFrequency)
         return true
     }
 
@@ -197,14 +210,11 @@ open class SharedStorageBehaviour(
     fun addToGoggleTooltip(
         tooltip: MutableList<Component>,
         isPlayerSneaking: Boolean,
-        blockEntities: Set<SmartBlockEntity>,
     ) {
         val frequencyItem = getFrequency().stack
         val frequencyOwner = getFrequency().resolvableProfile
 
-        val count = blockEntities.count {
-            getFrequency() == it.getBehaviour(SharedStorageBehaviour.TYPE).getFrequency()
-        }
+        val count = SharedStorageHandler.instance?.getFrequencyCount(getFrequency()) ?: 0
 
         CelLang.translate("gui.goggles.storage_stat").forGoggles(tooltip)
 
