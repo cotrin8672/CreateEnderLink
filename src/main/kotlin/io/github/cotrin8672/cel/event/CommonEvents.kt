@@ -1,6 +1,8 @@
 package io.github.cotrin8672.cel.event
 
 import io.github.cotrin8672.cel.util.SharedStorageHandler
+import io.github.cotrin8672.cel.util.LinkCountTracker
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.level.saveddata.SavedData.Factory
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
@@ -28,5 +30,8 @@ object CommonEvents {
     @SubscribeEvent
     fun onTickEvent(event: LevelTickEvent.Pre) {
         SharedStorageHandler.instance?.tick()
+        val level = event.level
+        if (level is ServerLevel)
+            LinkCountTracker.tick(level)
     }
 }

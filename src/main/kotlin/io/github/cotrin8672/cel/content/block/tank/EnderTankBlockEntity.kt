@@ -8,6 +8,7 @@ import io.github.cotrin8672.cel.content.SharedStorageBehaviour
 import io.github.cotrin8672.cel.content.storage.SharedFluidTank
 import io.github.cotrin8672.cel.registry.CelBlockEntityTypes
 import io.github.cotrin8672.cel.util.SharedStorageHandler
+import io.github.cotrin8672.cel.util.LinkCountTracker
 import net.createmod.ponder.api.level.PonderLevel
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -17,6 +18,7 @@ import net.minecraft.network.chat.CommonComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.server.level.ServerLevel
 import net.neoforged.neoforge.capabilities.Capabilities
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent
 import java.util.*
@@ -43,7 +45,17 @@ class EnderTankBlockEntity(
 
     init {
         val isAlreadyExists = blockEntities.map { it.blockPos }.contains(this.blockPos)
-        if (!isAlreadyExists) blockEntities.add(this)
+        if (!isAlreadyExists) {
+            blockEntities.add(this)
+            LinkCountTracker.track(this)
+        }
+    }
+
+    override fun onLoad() {
+        super.onLoad()
+        if (level is ServerLevel) {
+            LinkCountTracker.track(this)
+        }
     }
 
     private var luminosity = 0
@@ -92,7 +104,7 @@ class EnderTankBlockEntity(
         )
         tooltip.add(CommonComponents.EMPTY)
 
-        getBehaviour(SharedStorageBehaviour.TYPE).addToGoggleTooltip(tooltip, isPlayerSneaking, blockEntities)
+        getBehaviour(SharedStorageBehaviour.TYPE).addToGoggleTooltip(tooltip, isPlayerSneaking, blockEntities, false)
 
         return true
     }
@@ -100,16 +112,19 @@ class EnderTankBlockEntity(
     override fun destroy() {
         super.destroy()
         blockEntities.remove(this)
+        LinkCountTracker.untrack(this)
     }
 
     override fun remove() {
         super.remove()
         blockEntities.remove(this)
+        LinkCountTracker.untrack(this)
     }
 
     override fun onChunkUnloaded() {
         super.onChunkUnloaded()
         blockEntities.remove(this)
+        LinkCountTracker.untrack(this)
     }
 
     override fun sendData() {
