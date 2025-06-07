@@ -2,6 +2,7 @@ package io.github.cotrin8672.cel.event
 
 import io.github.cotrin8672.cel.network.SyncSharedStoragePacket
 import io.github.cotrin8672.cel.util.SharedStorageHandler
+import io.github.cotrin8672.cel.util.LinkCountTracker
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerPlayer
 import net.neoforged.bus.api.SubscribeEvent
@@ -18,5 +19,6 @@ object ServerEvents {
         val level = player.serverLevel()
         val nbt = SharedStorageHandler.instance?.save(CompoundTag(), level.registryAccess()) ?: return
         PacketDistributor.sendToPlayer(player, SyncSharedStoragePacket(nbt))
+        LinkCountTracker.sendToPlayer(player)
     }
 }

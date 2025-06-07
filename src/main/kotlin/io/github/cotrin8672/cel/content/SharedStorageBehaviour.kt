@@ -12,6 +12,7 @@ import com.simibubi.create.infrastructure.config.AllConfigs
 import io.github.cotrin8672.cel.registry.CelDataComponents
 import io.github.cotrin8672.cel.registry.CelItems
 import io.github.cotrin8672.cel.util.CelLang
+import io.github.cotrin8672.cel.client.LinkCountCache
 import io.github.cotrin8672.cel.util.StorageFrequency
 import io.github.cotrin8672.cel.util.use
 import net.createmod.catnip.math.VecHelper
@@ -235,12 +236,20 @@ open class SharedStorageBehaviour(
         tooltip: MutableList<Component>,
         isPlayerSneaking: Boolean,
         blockEntities: Set<SmartBlockEntity>,
+        isVault: Boolean,
     ) {
         val frequencyItem = getFrequency().stack
         val frequencyOwner = getFrequency().resolvableProfile
 
-        val count = blockEntities.count {
-            getFrequency() == it.getBehaviour(SharedStorageBehaviour.TYPE).getFrequency()
+        val count = if (blockEntity.level?.isClientSide == true) {
+            if (isVault)
+                LinkCountCache.getVaultCount(getFrequency())
+            else
+                LinkCountCache.getTankCount(getFrequency())
+        } else {
+            blockEntities.count {
+                getFrequency() == it.getBehaviour(SharedStorageBehaviour.TYPE).getFrequency()
+            }
         }
 
         CelLang.translate("gui.goggles.storage_stat").forGoggles(tooltip)
