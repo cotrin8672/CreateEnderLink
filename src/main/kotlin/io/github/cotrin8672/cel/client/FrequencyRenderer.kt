@@ -167,7 +167,9 @@ object FrequencyRenderer {
                 ValueBoxRenderer.renderItemIntoValueBox(frequencyItem, this, buffer, light, overlay)
             }
         } else {
-            ValueBoxRenderer.renderItemIntoValueBox(frequencyItem, this, buffer, light, overlay)
+            this.use {
+                ValueBoxRenderer.renderItemIntoValueBox(frequencyItem, this, buffer, light, overlay)
+            }
         }
     }
 }

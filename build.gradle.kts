@@ -87,7 +87,7 @@ repositories {
         url = uri("https://thedarkcolour.github.io/KotlinForForge/")
         content { includeGroup("thedarkcolour") }
     }
-    maven("https://maven.blamejared.com") // JEI
+    maven("https://maven.blamejared.com/") // JEI
     maven("https://maven.createmod.net") // Create, Ponder, Flywheel
     maven("https://mvn.devos.one/snapshots") // Registrate
     maven("https://raw.githubusercontent.com/Fuzss/modresources/main/maven/") // Forge Config API Port
@@ -108,7 +108,7 @@ dependencies {
 
     runtimeOnly("top.theillusivec4.curios:curios-neoforge:9.2.2+1.21.1")
     compileOnly("top.theillusivec4.curios:curios-neoforge:9.2.2+1.21.1:api")
-    implementation(libs.jei)
+    runtimeOnly(libs.jei)
 }
 
 publisher {
