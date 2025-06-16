@@ -4,8 +4,15 @@
   "createenderlink.tooltip.frequency.click_to_replace": "点击以替换",
   "block.createenderlink.ender_vault": "末影保险库",
   "block.createenderlink.ender_tank": "末影流体储罐",
+  "item.createenderlink.scope_filter": "范围过滤器",
+  "item.createenderlink.scope_filter.tooltip.condition1": "右击时",
+  "item.createenderlink.scope_filter.tooltip.behaviour1": "打开_配置界面_。",
+  "item.createenderlink.scope_filter.tooltip.summary": "将_玩家信息_与_物品_结合，形成_特有的频率_，防止与其他玩家发生_频率冲突_。",
   "createenderlink.gui.goggles.storage_stat": "存储数据：",
   "createenderlink.gui.goggles.same_frequency_count": "已链接数：",
+  "createenderlink.gui.goggles.frequency_item": "频率：",
+  "createenderlink.gui.goggles.frequency_scope": "范围：",
+  "createenderlink.gui.goggles.scope_global": "全局",
   "createenderlink.gui.goggles.block.singular": "个方块",
   "createenderlink.gui.goggles.block.plural": "个方块",
   "createenderlink.gui.goggles.at_current_loading": "正在运行",
@@ -23,5 +30,9 @@
   "createenderlink.ponder.ender_tank_sharing.text_2": "末影流体储罐顶面有一个可以用于设定频率的槽",
   "createenderlink.ponder.ender_tank_sharing.text_3": "用物品右击槽以设定频率",
   "createenderlink.ponder.ender_tank_sharing.text_4": "频率相同的末影流体储罐将会共享它们的存储内容",
-  "createenderlink.ponder.ender_tank_sharing.text_5": "当玩家戴上工程师护目镜时，可以看到已链接的末影流体储罐数量"
+  "createenderlink.ponder.ender_tank_sharing.text_5": "当玩家戴上工程师护目镜时，可以看到已链接的末影流体储罐数量",
+  "createenderlink.storage_frequency.set": "复制频率",
+  "createenderlink.storage_frequency.is_set": "频率配置",
+  "createenderlink.storage_frequency.craft_to_reset": "放置在合成网格中以重置",
+  "createenderlink.storage_frequency.not_holding_enough_scope_filter": "范围过滤器不足"
 }
