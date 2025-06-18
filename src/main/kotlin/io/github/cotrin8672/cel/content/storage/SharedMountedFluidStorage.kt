@@ -4,7 +4,7 @@ import com.mojang.serialization.MapCodec
 import com.simibubi.create.api.contraption.storage.fluid.MountedFluidStorage
 import io.github.cotrin8672.cel.registry.CelMountedStorageTypes
 import io.github.cotrin8672.cel.util.SharedStorageHandler
-import io.github.cotrin8672.cel.util.StorageFrequency
+import io.github.cotrin8672.cel.model.StorageFrequency
 import net.minecraft.core.BlockPos
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.entity.BlockEntity

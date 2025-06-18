@@ -2,6 +2,7 @@ package io.github.cotrin8672.cel.util
 
 import io.github.cotrin8672.cel.content.storage.SharedFluidTank
 import io.github.cotrin8672.cel.content.storage.SharedItemStackHandler
+import io.github.cotrin8672.cel.model.StorageFrequency
 import net.minecraft.core.HolderLookup.Provider
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag

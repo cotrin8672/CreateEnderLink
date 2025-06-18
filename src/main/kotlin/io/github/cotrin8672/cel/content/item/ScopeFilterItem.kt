@@ -1,10 +1,11 @@
 package io.github.cotrin8672.cel.content.item
 
 import com.simibubi.create.AllKeys
+import io.github.cotrin8672.cel.model.ProfileKey
 import io.github.cotrin8672.cel.registry.CelDataComponents
 import io.github.cotrin8672.cel.registry.CelItems
 import io.github.cotrin8672.cel.util.CelLang
-import io.github.cotrin8672.cel.util.StorageFrequency
+import io.github.cotrin8672.cel.model.StorageFrequency
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
@@ -18,10 +19,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.TooltipFlag
-import net.minecraft.world.item.component.ResolvableProfile
 import net.minecraft.world.item.context.UseOnContext
 import net.minecraft.world.level.Level
-import kotlin.jvm.optionals.getOrNull
 
 class ScopeFilterItem(properties: Properties) : Item(properties), MenuProvider {
     override fun useOn(context: UseOnContext): InteractionResult {
@@ -33,7 +32,10 @@ class ScopeFilterItem(properties: Properties) : Item(properties), MenuProvider {
         val heldItem = player.getItemInHand(hand)
         val oldStorageFrequency = heldItem.get(CelDataComponents.STORAGE_FREQUENCY)
         val storageFrequency =
-            StorageFrequency.of(oldStorageFrequency?.stack ?: ItemStack.EMPTY, ResolvableProfile(player.gameProfile))
+            StorageFrequency.of(
+                oldStorageFrequency?.stack ?: ItemStack.EMPTY,
+                ProfileKey(player.uuid, player.name.string)
+            )
         heldItem.set(CelDataComponents.STORAGE_FREQUENCY, storageFrequency)
         if (!world.isClientSide && player is ServerPlayer)
             player.openMenu(this) { buf ->
@@ -51,7 +53,7 @@ class ScopeFilterItem(properties: Properties) : Item(properties), MenuProvider {
         if (AllKeys.shiftDown()) return
 
         val storageFrequency = stack.get(CelDataComponents.STORAGE_FREQUENCY)
-        val frequencyOwnerName = storageFrequency?.resolvableProfile?.name?.getOrNull()
+        val frequencyOwnerName = storageFrequency?.profileKey?.name
         val frequencyOwnerTip = CelLang.translate("gui.goggles.frequency_scope")
             .add(
                 if (frequencyOwnerName == null)

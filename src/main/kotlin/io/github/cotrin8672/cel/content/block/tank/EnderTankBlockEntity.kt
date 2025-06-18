@@ -7,7 +7,9 @@ import com.simibubi.create.foundation.blockEntity.behaviour.CenteredSideValueBox
 import io.github.cotrin8672.cel.content.SharedStorageBehaviour
 import io.github.cotrin8672.cel.content.storage.SharedFluidTank
 import io.github.cotrin8672.cel.registry.CelBlockEntityTypes
+import io.github.cotrin8672.cel.util.LinkCountManager
 import io.github.cotrin8672.cel.util.SharedStorageHandler
+import io.github.cotrin8672.cel.util.blockKey
 import net.createmod.ponder.api.level.PonderLevel
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -19,7 +21,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
 import net.neoforged.neoforge.capabilities.Capabilities
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent
-import java.util.*
 
 class EnderTankBlockEntity(
     type: BlockEntityType<*>,
@@ -35,15 +36,10 @@ class EnderTankBlockEntity(
                 return@registerBlockEntity be.getFluidTank()
             }
         }
-
-        private val blockEntities: MutableSet<EnderTankBlockEntity> = Collections.newSetFromMap(WeakHashMap())
-
-        fun getLoadingBlockEntities(): Set<EnderTankBlockEntity> = blockEntities.toSet()
     }
 
     init {
-        val isAlreadyExists = blockEntities.map { it.blockPos }.contains(this.blockPos)
-        if (!isAlreadyExists) blockEntities.add(this)
+        LinkCountManager.registerEntity(blockKey, this)
     }
 
     private var luminosity = 0
@@ -92,24 +88,24 @@ class EnderTankBlockEntity(
         )
         tooltip.add(CommonComponents.EMPTY)
 
-        getBehaviour(SharedStorageBehaviour.TYPE).addToGoggleTooltip(tooltip, isPlayerSneaking, blockEntities)
+        getBehaviour(SharedStorageBehaviour.TYPE).addToGoggleTooltip(tooltip, isPlayerSneaking)
 
         return true
     }
 
     override fun destroy() {
         super.destroy()
-        blockEntities.remove(this)
+        LinkCountManager.unregisterEntity(blockKey, this)
     }
 
     override fun remove() {
         super.remove()
-        blockEntities.remove(this)
+        LinkCountManager.unregisterEntity(blockKey, this)
     }
 
     override fun onChunkUnloaded() {
         super.onChunkUnloaded()
-        blockEntities.remove(this)
+        LinkCountManager.unregisterEntity(blockKey, this)
     }
 
     override fun sendData() {
