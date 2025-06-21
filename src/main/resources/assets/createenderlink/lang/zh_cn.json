@@ -29,5 +29,9 @@
   "createenderlink.ponder.ender_tank_sharing.text_2": "末影流体储罐顶面有一个可以用于设定频率的槽",
   "createenderlink.ponder.ender_tank_sharing.text_3": "用物品右击槽以设定频率",
   "createenderlink.ponder.ender_tank_sharing.text_4": "频率相同的末影流体储罐将会共享它们的存储内容",
-  "createenderlink.ponder.ender_tank_sharing.text_5": "当玩家戴上工程师护目镜时，可以看到已链接的末影流体储罐数量"
+  "createenderlink.ponder.ender_tank_sharing.text_5": "当玩家戴上工程师护目镜时，可以看到已链接的末影流体储罐数量",
+  "createenderlink.storage_frequency.set": "复制频率",
+  "createenderlink.storage_frequency.is_set": "频率配置",
+  "createenderlink.storage_frequency.craft_to_reset": "放置在合成网格中以重置",
+  "createenderlink.storage_frequency.not_holding_enough_scope_filter": "范围过滤器不足"
 }
