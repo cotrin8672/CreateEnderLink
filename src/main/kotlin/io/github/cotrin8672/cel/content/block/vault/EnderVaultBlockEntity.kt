@@ -6,9 +6,9 @@ import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour
 import com.simibubi.create.foundation.blockEntity.behaviour.CenteredSideValueBoxTransform
 import io.github.cotrin8672.cel.content.SharedStorageBehaviour
 import io.github.cotrin8672.cel.registry.CelBlockEntityTypes
+import io.github.cotrin8672.cel.registry.CelBlocks
 import io.github.cotrin8672.cel.util.LinkCountManager
 import io.github.cotrin8672.cel.util.SharedStorageHandler
-import io.github.cotrin8672.cel.util.blockKey
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerLevel
@@ -35,8 +35,10 @@ class EnderVaultBlockEntity(
         }
     }
 
-    init {
-        LinkCountManager.registerEntity(blockKey, this)
+    override fun onLoad() {
+        super.onLoad()
+        if (level is ServerLevel)
+            LinkCountManager.registerEntity(CelBlocks.ENDER_VAULT.key, this)
     }
 
     private fun getInventory(): IItemHandler? {
@@ -64,16 +66,16 @@ class EnderVaultBlockEntity(
 
     override fun destroy() {
         super.destroy()
-        LinkCountManager.unregisterEntity(blockKey, this)
+        LinkCountManager.unregisterEntity(CelBlocks.ENDER_VAULT.key, this)
     }
 
     override fun remove() {
         super.remove()
-        LinkCountManager.unregisterEntity(blockKey, this)
+        LinkCountManager.unregisterEntity(CelBlocks.ENDER_VAULT.key, this)
     }
 
     override fun onChunkUnloaded() {
         super.onChunkUnloaded()
-        LinkCountManager.unregisterEntity(blockKey, this)
+        LinkCountManager.unregisterEntity(CelBlocks.ENDER_VAULT.key, this)
     }
 }

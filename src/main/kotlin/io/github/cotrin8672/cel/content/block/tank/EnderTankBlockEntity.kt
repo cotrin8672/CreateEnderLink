@@ -7,9 +7,9 @@ import com.simibubi.create.foundation.blockEntity.behaviour.CenteredSideValueBox
 import io.github.cotrin8672.cel.content.SharedStorageBehaviour
 import io.github.cotrin8672.cel.content.storage.SharedFluidTank
 import io.github.cotrin8672.cel.registry.CelBlockEntityTypes
+import io.github.cotrin8672.cel.registry.CelBlocks
 import io.github.cotrin8672.cel.util.LinkCountManager
 import io.github.cotrin8672.cel.util.SharedStorageHandler
-import io.github.cotrin8672.cel.util.blockKey
 import net.createmod.ponder.api.level.PonderLevel
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -17,6 +17,7 @@ import net.minecraft.core.HolderLookup
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.CommonComponents
 import net.minecraft.network.chat.Component
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
 import net.neoforged.neoforge.capabilities.Capabilities
@@ -38,14 +39,16 @@ class EnderTankBlockEntity(
         }
     }
 
-    init {
-        LinkCountManager.registerEntity(blockKey, this)
-    }
-
     private var luminosity = 0
     private var queuedSync = false
     private var syncCooldown = 0
     private var ponderTank: SharedFluidTank? = null
+
+    override fun onLoad() {
+        super.onLoad()
+        if (level is ServerLevel)
+            LinkCountManager.registerEntity(CelBlocks.ENDER_TANK.key, this)
+    }
 
     fun getFluidTank(): SharedFluidTank? {
         if (level is PonderLevel) {
@@ -95,17 +98,17 @@ class EnderTankBlockEntity(
 
     override fun destroy() {
         super.destroy()
-        LinkCountManager.unregisterEntity(blockKey, this)
+        LinkCountManager.unregisterEntity(CelBlocks.ENDER_TANK.key, this)
     }
 
     override fun remove() {
         super.remove()
-        LinkCountManager.unregisterEntity(blockKey, this)
+        LinkCountManager.unregisterEntity(CelBlocks.ENDER_TANK.key, this)
     }
 
     override fun onChunkUnloaded() {
         super.onChunkUnloaded()
-        LinkCountManager.unregisterEntity(blockKey, this)
+        LinkCountManager.unregisterEntity(CelBlocks.ENDER_TANK.key, this)
     }
 
     override fun sendData() {

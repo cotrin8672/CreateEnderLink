@@ -27,21 +27,27 @@ object LinkCountManager {
             )
         }
 
-    fun registerEntity(key: ResourceKey<Block>, entity: SmartBlockEntity) {
-        serverEntities.compute(key) { _, list ->
-            val newList = list ?: mutableListOf()
-            newList.add(WeakReference(entity))
-            newList
+    fun registerEntity(key: ResourceKey<Block>?, entity: SmartBlockEntity) {
+        key?.let {
+            serverEntities.compute(it) { _, list ->
+                val newList = list ?: mutableListOf()
+                newList.add(WeakReference(entity))
+                newList
+            }
         }
         PacketDistributor.sendToAllPlayers(SyncFullLinkPacket(linkedList))
     }
 
-    fun unregisterEntity(key: ResourceKey<Block>, entity: SmartBlockEntity) {
+    fun unregisterEntity(key: ResourceKey<Block>?, entity: SmartBlockEntity) {
         serverEntities[key]?.let { list ->
             list.removeAll { ref -> ref.get() == entity || ref.get() == null }
             if (list.isEmpty()) serverEntities.remove(key)
             PacketDistributor.sendToAllPlayers(SyncFullLinkPacket(linkedList))
         }
+    }
+
+    fun getLoadingBlockEntities(key: ResourceKey<Block>): List<SmartBlockEntity> {
+        return serverEntities.getOrDefault(key, listOf()).mapNotNull(WeakReference<SmartBlockEntity>::get)
     }
 
     private val clientCache: MutableList<LinkedCount> = mutableListOf()

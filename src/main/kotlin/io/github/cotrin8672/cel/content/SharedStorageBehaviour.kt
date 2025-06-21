@@ -17,11 +17,8 @@ import io.github.cotrin8672.cel.util.CelLang
 import io.github.cotrin8672.cel.util.LinkCountManager
 import io.github.cotrin8672.cel.util.LinkCountManager.linkedList
 import io.github.cotrin8672.cel.util.blockKey
-import io.github.cotrin8672.cel.util.use
 import net.createmod.catnip.math.VecHelper
 import net.minecraft.ChatFormatting
-import net.minecraft.client.gui.Font
-import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.core.Direction
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.component.DataComponents
@@ -29,6 +26,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.Tag
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.InteractionHand
@@ -37,7 +35,6 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
-import net.neoforged.neoforge.client.IItemDecorator
 import net.neoforged.neoforge.network.PacketDistributor
 import kotlin.math.max
 
@@ -48,38 +45,7 @@ open class SharedStorageBehaviour(
     companion object {
         val TYPE = BehaviourType<SharedStorageBehaviour>()
 
-        val DECORATOR = IItemDecorator { guiGraphics: GuiGraphics, font: Font, stack: ItemStack, x: Int, y: Int ->
-            val storageFrequency = stack.get(CelDataComponents.STORAGE_FREQUENCY)
-                ?: return@IItemDecorator false
-            val frequencyItem = storageFrequency.stack
-            if (frequencyItem.isEmpty) false
-            guiGraphics.pose().use {
-                val xOffset = x + 15f
-                val yOffset = y + 15f
-                translate(xOffset, yOffset, 0f)
-                scale(0.5f, 0.5f, 1f)
-                translate(-xOffset, -yOffset, 100f)
-                guiGraphics.renderItem(
-                    if (storageFrequency.isGlobalScope)
-                        storageFrequency.stack
-                    else
-                        CelItems.SCOPE_FILTER.asStack(), x, y
-                )
 
-                if (storageFrequency.isPersonalScope) {
-                    use {
-                        val xOffset = x + 8f
-                        val yOffset = y + 8f
-                        translate(xOffset, yOffset, 0f)
-                        scale(0.5f, 0.5f, 1f)
-                        translate(-xOffset, -yOffset, 10f)
-                        guiGraphics.renderItem(storageFrequency.stack, x, y)
-                    }
-                }
-            }
-
-            true
-        }
     }
 
     private var storageFrequency: StorageFrequency = StorageFrequency.EMPTY
@@ -168,7 +134,8 @@ open class SharedStorageBehaviour(
         }
         blockEntity.setChanged()
         blockEntity.sendData()
-        PacketDistributor.sendToAllPlayers(SyncFullLinkPacket(linkedList))
+        if (blockEntity.level is ServerLevel)
+            PacketDistributor.sendToAllPlayers(SyncFullLinkPacket(linkedList))
         return true
     }
 
@@ -243,7 +210,7 @@ open class SharedStorageBehaviour(
         val frequencyItem = getFrequency().stack
         val frequencyOwner = getFrequency().profileKey
 
-        val count = LinkCountManager.getLinkedCount(blockEntity.blockKey, getFrequency())
+        val count = blockEntity.blockKey?.let { LinkCountManager.getLinkedCount(it, getFrequency()) } ?: 0
 
         CelLang.translate("gui.goggles.storage_stat").forGoggles(tooltip)
 

@@ -9,6 +9,7 @@ import io.github.cotrin8672.cel.util.LinkCountManager.linkedList
 import io.github.cotrin8672.cel.util.consumeItem
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.ItemStack
@@ -53,7 +54,8 @@ class SharedStorageBlockItem(block: Block, properties: Properties) : BlockItem(b
             }
         }
 
-        PacketDistributor.sendToAllPlayers(SyncFullLinkPacket(linkedList))
+        if (context.level is ServerLevel)
+            PacketDistributor.sendToAllPlayers(SyncFullLinkPacket(linkedList))
 
         return result
     }
