@@ -9,6 +9,7 @@ import io.github.cotrin8672.cel.content.block.vault.EnderVaultBlockEntity
 import io.github.cotrin8672.cel.datagen.CelDatagen
 import io.github.cotrin8672.cel.network.SyncFullLinkPacket
 import io.github.cotrin8672.cel.network.SyncSharedStoragePacket
+import io.github.cotrin8672.cel.network.UpdateSharedTankPacket
 import io.github.cotrin8672.cel.registry.*
 import io.github.cotrin8672.cel.util.LinkCountManager
 import io.github.cotrin8672.cel.util.SharedStorageHandler
@@ -74,6 +75,15 @@ object CreateEnderLink {
         ) { packet, context ->
             context.enqueueWork {
                 LinkCountManager.onClientPacketReceived(packet.linkedList)
+            }
+        }
+
+        registrar.playBidirectional(
+            UpdateSharedTankPacket.TYPE,
+            UpdateSharedTankPacket.STREAM_CODEC,
+        ) { packet, context ->
+            context.enqueueWork {
+                SharedStorageHandler.instance?.updateTankContentFromPacket(packet)
             }
         }
     }

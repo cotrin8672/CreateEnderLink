@@ -2,10 +2,10 @@ package io.github.cotrin8672.cel.content.block.tank
 
 import com.mojang.blaze3d.vertex.PoseStack
 import com.simibubi.create.foundation.blockEntity.renderer.SmartBlockEntityRenderer
-import com.simibubi.create.foundation.fluid.FluidRenderer
 import io.github.cotrin8672.cel.client.FrequencyRenderer
 import io.github.cotrin8672.cel.content.SharedStorageBehaviour
 import io.github.cotrin8672.cel.util.SharedStorageHandler
+import net.createmod.catnip.platform.NeoForgeCatnipServices
 import net.createmod.ponder.api.level.PonderLevel
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider.Context
@@ -53,11 +53,10 @@ class EnderTankRenderer(context: Context) : SmartBlockEntityRenderer<EnderTankBl
         val zMax = 1 - tankHullWidth
 
         ms.use {
-            FluidRenderer.renderFluidBox(
-                fluidStack.fluid,
-                fluidStack.amount.toLong(),
+            NeoForgeCatnipServices.FLUID_RENDERER.renderFluidBox(
+                fluidStack,
                 xMin, yMin, zMin, xMax, yMax, zMax,
-                buffer, ms, light, false, true, fluidStack.componentsPatch
+                buffer, ms, light, false, true
             )
         }
     }

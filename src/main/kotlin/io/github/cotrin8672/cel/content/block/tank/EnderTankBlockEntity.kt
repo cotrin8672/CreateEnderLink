@@ -6,6 +6,7 @@ import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour
 import com.simibubi.create.foundation.blockEntity.behaviour.CenteredSideValueBoxTransform
 import io.github.cotrin8672.cel.content.SharedStorageBehaviour
 import io.github.cotrin8672.cel.content.storage.SharedFluidTank
+import io.github.cotrin8672.cel.model.StorageFrequency
 import io.github.cotrin8672.cel.registry.CelBlockEntityTypes
 import io.github.cotrin8672.cel.registry.CelBlocks
 import io.github.cotrin8672.cel.util.LinkCountManager
@@ -52,7 +53,7 @@ class EnderTankBlockEntity(
 
     fun getFluidTank(): SharedFluidTank? {
         if (level is PonderLevel) {
-            if (ponderTank == null) ponderTank = SharedFluidTank(10000, null)
+            if (ponderTank == null) ponderTank = SharedFluidTank(10000, null, StorageFrequency.EMPTY)
             return ponderTank
         }
         val behaviour = getBehaviour(SharedStorageBehaviour.TYPE) ?: return null

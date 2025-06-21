@@ -1,6 +1,8 @@
 package io.github.cotrin8672.cel.content.storage
 
 import io.github.cotrin8672.cel.content.block.tank.EnderTankBlockEntity
+import io.github.cotrin8672.cel.model.StorageFrequency
+import io.github.cotrin8672.cel.network.UpdateSharedTankPacket
 import io.github.cotrin8672.cel.registry.CelBlocks
 import io.github.cotrin8672.cel.util.LinkCountManager
 import io.github.cotrin8672.cel.util.SharedStorageHandler
@@ -10,8 +12,13 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerLevel
 import net.neoforged.neoforge.fluids.FluidStack
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank
+import net.neoforged.neoforge.network.PacketDistributor
 
-class SharedFluidTank(capacity: Int, private val handler: SharedStorageHandler?) : FluidTank(capacity) {
+class SharedFluidTank(
+    capacity: Int,
+    private val handler: SharedStorageHandler?,
+    private val storageFrequency: StorageFrequency,
+) : FluidTank(capacity) {
     var fluidLevel: LerpedFloat? = null
     var forceFluidLevelUpdate = true
 
@@ -58,9 +65,8 @@ class SharedFluidTank(capacity: Int, private val handler: SharedStorageHandler?)
 
         val anyBe = LinkCountManager.getLoadingBlockEntities(CelBlocks.ENDER_TANK.key!!).firstOrNull()
         val level = anyBe?.level
-        if (level is ServerLevel) {
-//            val nbt = SharedStorageHandler.instance?.save(CompoundTag(), level.registryAccess()) ?: return
-//            PacketDistributor.sendToAllPlayers(SyncSharedStoragePacket(nbt))
+        if (level is ServerLevel && level.server.isDedicatedServer) {
+            PacketDistributor.sendToAllPlayers(UpdateSharedTankPacket(storageFrequency, getFluid()))
         }
 
 
