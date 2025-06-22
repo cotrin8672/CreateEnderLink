@@ -1,7 +1,7 @@
 package io.github.cotrin8672.cel.registry
 
 import io.github.cotrin8672.cel.CreateEnderLink
-import io.github.cotrin8672.cel.util.StorageFrequency
+import io.github.cotrin8672.cel.model.StorageFrequency
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.registries.Registries
 import net.neoforged.bus.api.IEventBus

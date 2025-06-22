@@ -5,7 +5,7 @@ import com.simibubi.create.api.contraption.storage.item.MountedItemStorage
 import com.simibubi.create.content.contraptions.Contraption
 import io.github.cotrin8672.cel.registry.CelMountedStorageTypes
 import io.github.cotrin8672.cel.util.SharedStorageHandler
-import io.github.cotrin8672.cel.util.StorageFrequency
+import io.github.cotrin8672.cel.model.StorageFrequency
 import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.item.ItemStack

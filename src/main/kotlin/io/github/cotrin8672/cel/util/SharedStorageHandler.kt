@@ -2,6 +2,8 @@ package io.github.cotrin8672.cel.util
 
 import io.github.cotrin8672.cel.content.storage.SharedFluidTank
 import io.github.cotrin8672.cel.content.storage.SharedItemStackHandler
+import io.github.cotrin8672.cel.model.StorageFrequency
+import io.github.cotrin8672.cel.network.UpdateSharedTankPacket
 import net.minecraft.core.HolderLookup.Provider
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
@@ -29,7 +31,13 @@ class SharedStorageHandler : SavedData() {
 
     fun getOrCreateSharedFluidStorage(frequency: StorageFrequency): SharedFluidTank {
         return sharedFluidStorage.computeIfAbsent(frequency) {
-            SharedFluidTank(10000, this)
+            SharedFluidTank(10000, this, frequency)
+        }
+    }
+
+    fun updateTankContentFromPacket(packet: UpdateSharedTankPacket) {
+        sharedFluidStorage[packet.storageFrequency]?.apply {
+            this.fluid = packet.fluidStack
         }
     }
 
@@ -70,7 +78,7 @@ class SharedStorageHandler : SavedData() {
             tag.getList("SharedStorage", Tag.TAG_COMPOUND.toInt())
         else
             tag.getList("SharedVaultStorage", Tag.TAG_COMPOUND.toInt())
-        
+
         for (item in list.asIterable()) {
             if (item !is CompoundTag) continue
 
@@ -99,12 +107,12 @@ class SharedStorageHandler : SavedData() {
                 val frequencyItemTag = item.getCompound("Frequency")
                 val inventoryTag = item.getCompound("Tank")
                 val frequency = StorageFrequency.of(ItemStack.parseOptional(registries, frequencyItemTag))
-                val fluidTank = SharedFluidTank(10000, this).apply { readFromNBT(registries, inventoryTag) }
+                val fluidTank = SharedFluidTank(10000, this, frequency).apply { readFromNBT(registries, inventoryTag) }
 
                 sharedFluidStorage[frequency] = fluidTank
             } else if (item.contains("StorageFrequency", Tag.TAG_COMPOUND.toInt())) {
                 val storageFrequency = StorageFrequency.parseOptional(registries, item.getCompound("StorageFrequency"))
-                val fluidTank = SharedFluidTank(10000, this).apply {
+                val fluidTank = SharedFluidTank(10000, this, storageFrequency).apply {
                     readFromNBT(registries, item.getCompound("Tank"))
                 }
 

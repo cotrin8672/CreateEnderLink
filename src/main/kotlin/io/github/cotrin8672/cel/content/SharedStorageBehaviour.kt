@@ -9,10 +9,14 @@ import com.simibubi.create.foundation.blockEntity.behaviour.*
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueSettingsBehaviour.ValueSettings
 import com.simibubi.create.foundation.utility.CreateLang
 import com.simibubi.create.infrastructure.config.AllConfigs
+import io.github.cotrin8672.cel.model.StorageFrequency
+import io.github.cotrin8672.cel.network.SyncFullLinkPacket
 import io.github.cotrin8672.cel.registry.CelDataComponents
 import io.github.cotrin8672.cel.registry.CelItems
 import io.github.cotrin8672.cel.util.CelLang
-import io.github.cotrin8672.cel.util.StorageFrequency
+import io.github.cotrin8672.cel.util.LinkCountManager
+import io.github.cotrin8672.cel.util.LinkCountManager.linkedList
+import io.github.cotrin8672.cel.util.blockKey
 import net.createmod.catnip.math.VecHelper
 import net.minecraft.ChatFormatting
 import net.minecraft.core.Direction
@@ -22,6 +26,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.Tag
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.InteractionHand
@@ -30,7 +35,7 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
-import kotlin.jvm.optionals.getOrDefault
+import net.neoforged.neoforge.network.PacketDistributor
 import kotlin.math.max
 
 open class SharedStorageBehaviour(
@@ -39,6 +44,8 @@ open class SharedStorageBehaviour(
 ) : BlockEntityBehaviour(be), ValueSettingsBehaviour {
     companion object {
         val TYPE = BehaviourType<SharedStorageBehaviour>()
+
+
     }
 
     private var storageFrequency: StorageFrequency = StorageFrequency.EMPTY
@@ -127,6 +134,8 @@ open class SharedStorageBehaviour(
         }
         blockEntity.setChanged()
         blockEntity.sendData()
+        if (blockEntity.level is ServerLevel)
+            PacketDistributor.sendToAllPlayers(SyncFullLinkPacket(linkedList))
         return true
     }
 
@@ -197,14 +206,11 @@ open class SharedStorageBehaviour(
     fun addToGoggleTooltip(
         tooltip: MutableList<Component>,
         isPlayerSneaking: Boolean,
-        blockEntities: Set<SmartBlockEntity>,
     ) {
         val frequencyItem = getFrequency().stack
-        val frequencyOwner = getFrequency().resolvableProfile
+        val frequencyOwner = getFrequency().profileKey
 
-        val count = blockEntities.count {
-            getFrequency() == it.getBehaviour(SharedStorageBehaviour.TYPE).getFrequency()
-        }
+        val count = blockEntity.blockKey?.let { LinkCountManager.getLinkedCount(it, getFrequency()) } ?: 0
 
         CelLang.translate("gui.goggles.storage_stat").forGoggles(tooltip)
 
@@ -213,7 +219,7 @@ open class SharedStorageBehaviour(
                 if (getFrequency().isGlobalScope)
                     CelLang.translate("gui.goggles.scope_global").component()
                 else
-                    Component.literal(frequencyOwner.name.getOrDefault(""))
+                    Component.literal(frequencyOwner.name)
             )
             .style(ChatFormatting.YELLOW)
             .forGoggles(tooltip)

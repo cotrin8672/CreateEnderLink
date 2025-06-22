@@ -23,11 +23,11 @@ object ClientEvents {
         event.register(CelBlocks.ENDER_TANK, DECORATOR)
     }
 
-    private val DECORATOR = IItemDecorator { guiGraphics: GuiGraphics, font: Font, stack: ItemStack, x: Int, y: Int ->
+    val DECORATOR = IItemDecorator { guiGraphics: GuiGraphics, font: Font, stack: ItemStack, x: Int, y: Int ->
         val storageFrequency = stack.get(CelDataComponents.STORAGE_FREQUENCY)
             ?: return@IItemDecorator false
         val frequencyItem = storageFrequency.stack
-        if (frequencyItem.isEmpty) return@IItemDecorator false
+        if (frequencyItem.isEmpty) false
         guiGraphics.pose().use {
             val xOffset = x + 15f
             val yOffset = y + 15f
@@ -43,11 +43,11 @@ object ClientEvents {
 
             if (storageFrequency.isPersonalScope) {
                 use {
-                    val scopeXOffset = x + 8f
-                    val scopeYOffset = y + 8f
-                    translate(scopeXOffset, scopeYOffset, 0f)
+                    val xOffset = x + 8f
+                    val yOffset = y + 8f
+                    translate(xOffset, yOffset, 0f)
                     scale(0.5f, 0.5f, 1f)
-                    translate(-scopeXOffset, -scopeYOffset, 10f)
+                    translate(-xOffset, -yOffset, 10f)
                     guiGraphics.renderItem(storageFrequency.stack, x, y)
                 }
             }

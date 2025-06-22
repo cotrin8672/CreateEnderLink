@@ -7,8 +7,11 @@ import com.simibubi.create.foundation.item.TooltipModifier
 import io.github.cotrin8672.cel.content.block.tank.EnderTankBlockEntity
 import io.github.cotrin8672.cel.content.block.vault.EnderVaultBlockEntity
 import io.github.cotrin8672.cel.datagen.CelDatagen
+import io.github.cotrin8672.cel.network.SyncFullLinkPacket
 import io.github.cotrin8672.cel.network.SyncSharedStoragePacket
+import io.github.cotrin8672.cel.network.UpdateSharedTankPacket
 import io.github.cotrin8672.cel.registry.*
+import io.github.cotrin8672.cel.util.LinkCountManager
 import io.github.cotrin8672.cel.util.SharedStorageHandler
 import net.createmod.catnip.lang.FontHelper
 import net.minecraft.resources.ResourceLocation
@@ -63,6 +66,24 @@ object CreateEnderLink {
             context.enqueueWork {
                 val level = context.player().level()
                 SharedStorageHandler.instance = SharedStorageHandler.load(packet.data, level.registryAccess())
+            }
+        }
+
+        registrar.playBidirectional(
+            SyncFullLinkPacket.TYPE,
+            SyncFullLinkPacket.STREAM_CODEC,
+        ) { packet, context ->
+            context.enqueueWork {
+                LinkCountManager.onClientPacketReceived(packet.linkedList)
+            }
+        }
+
+        registrar.playBidirectional(
+            UpdateSharedTankPacket.TYPE,
+            UpdateSharedTankPacket.STREAM_CODEC,
+        ) { packet, context ->
+            context.enqueueWork {
+                SharedStorageHandler.instance?.updateTankContentFromPacket(packet)
             }
         }
     }

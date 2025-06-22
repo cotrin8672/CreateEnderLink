@@ -6,6 +6,8 @@ import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour
 import com.simibubi.create.foundation.blockEntity.behaviour.CenteredSideValueBoxTransform
 import io.github.cotrin8672.cel.content.SharedStorageBehaviour
 import io.github.cotrin8672.cel.registry.CelBlockEntityTypes
+import io.github.cotrin8672.cel.registry.CelBlocks
+import io.github.cotrin8672.cel.util.LinkCountManager
 import io.github.cotrin8672.cel.util.SharedStorageHandler
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
@@ -16,7 +18,6 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.neoforged.neoforge.capabilities.Capabilities
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent
 import net.neoforged.neoforge.items.IItemHandler
-import java.util.*
 
 class EnderVaultBlockEntity(
     type: BlockEntityType<*>,
@@ -32,13 +33,12 @@ class EnderVaultBlockEntity(
                 return@registerBlockEntity be.getInventory()
             }
         }
-
-        private val blockEntities: MutableSet<EnderVaultBlockEntity> = Collections.newSetFromMap(WeakHashMap())
     }
 
-    init {
-        val isAlreadyExists = blockEntities.map { it.blockPos }.contains(this.blockPos)
-        if (!isAlreadyExists) blockEntities.add(this)
+    override fun onLoad() {
+        super.onLoad()
+        if (level is ServerLevel)
+            LinkCountManager.registerEntity(CelBlocks.ENDER_VAULT.key, this)
     }
 
     private fun getInventory(): IItemHandler? {
@@ -59,23 +59,23 @@ class EnderVaultBlockEntity(
 
     override fun addToGoggleTooltip(tooltip: MutableList<Component>, isPlayerSneaking: Boolean): Boolean {
         super.addToGoggleTooltip(tooltip, isPlayerSneaking)
-        getBehaviour(SharedStorageBehaviour.TYPE).addToGoggleTooltip(tooltip, isPlayerSneaking, blockEntities)
+        getBehaviour(SharedStorageBehaviour.TYPE).addToGoggleTooltip(tooltip, isPlayerSneaking)
 
         return true
     }
 
     override fun destroy() {
         super.destroy()
-        blockEntities.remove(this)
+        LinkCountManager.unregisterEntity(CelBlocks.ENDER_VAULT.key, this)
     }
 
     override fun remove() {
         super.remove()
-        blockEntities.remove(this)
+        LinkCountManager.unregisterEntity(CelBlocks.ENDER_VAULT.key, this)
     }
 
     override fun onChunkUnloaded() {
         super.onChunkUnloaded()
-        blockEntities.remove(this)
+        LinkCountManager.unregisterEntity(CelBlocks.ENDER_VAULT.key, this)
     }
 }

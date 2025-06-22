@@ -1,3 +1,3 @@
 ## Fixed
 
-- Fixed issue#32
+- Fixed issue#35, #44

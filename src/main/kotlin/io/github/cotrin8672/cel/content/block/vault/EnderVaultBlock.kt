@@ -7,7 +7,7 @@ import io.github.cotrin8672.cel.registry.CelBlockEntityTypes
 import io.github.cotrin8672.cel.registry.CelBlocks
 import io.github.cotrin8672.cel.registry.CelDataComponents
 import io.github.cotrin8672.cel.util.CelLang
-import io.github.cotrin8672.cel.util.StorageFrequency
+import io.github.cotrin8672.cel.model.StorageFrequency
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerPlayer
