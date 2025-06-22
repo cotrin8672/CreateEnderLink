@@ -6,8 +6,9 @@ import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour
 import com.simibubi.create.foundation.blockEntity.behaviour.CenteredSideValueBoxTransform
 import io.github.cotrin8672.cel.content.SharedStorageBehaviour
 import io.github.cotrin8672.cel.content.storage.SharedFluidTank
+import io.github.cotrin8672.cel.model.StorageFrequency
 import io.github.cotrin8672.cel.registry.CelBlocks
-import io.github.cotrin8672.cel.util.LinkedCountManager
+import io.github.cotrin8672.cel.util.LinkCountManager
 import io.github.cotrin8672.cel.util.SharedStorageHandler
 import net.createmod.ponder.api.level.PonderLevel
 import net.minecraft.core.BlockPos
@@ -15,6 +16,7 @@ import net.minecraft.core.Direction
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.CommonComponents
 import net.minecraft.network.chat.Component
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraftforge.common.capabilities.Capability
@@ -28,18 +30,20 @@ class EnderTankBlockEntity(
     pos: BlockPos,
     state: BlockState,
 ) : SmartBlockEntity(type, pos, state), IHaveGoggleInformation {
-    init {
-        LinkedCountManager.addLinkedBlock(CelBlocks.ENDER_TANK.key, this)
-    }
-
     private var luminosity = 0
     private var queuedSync = false
     private var syncCooldown = 0
     private var ponderTank: SharedFluidTank? = null
 
+    override fun onLoad() {
+        super.onLoad()
+        if (level is ServerLevel)
+            LinkCountManager.registerEntity(CelBlocks.ENDER_TANK.key, this)
+    }
+
     fun getFluidTank(): SharedFluidTank? {
         if (level is PonderLevel) {
-            if (ponderTank == null) ponderTank = SharedFluidTank(10000, null)
+            if (ponderTank == null) ponderTank = SharedFluidTank(10000, null, StorageFrequency.EMPTY)
             return ponderTank
         }
         val behaviour = getBehaviour(SharedStorageBehaviour.TYPE) ?: return null
@@ -85,28 +89,23 @@ class EnderTankBlockEntity(
 
         tooltip.add(CommonComponents.EMPTY)
 
-        val behaviour = getBehaviour(SharedStorageBehaviour.TYPE)
-        getBehaviour(SharedStorageBehaviour.TYPE).addToGoggleTooltip(
-            tooltip,
-            isPlayerSneaking,
-            LinkedCountManager.getLinkedCount(CelBlocks.ENDER_TANK.key, behaviour.getFrequency())
-        )
+        getBehaviour(SharedStorageBehaviour.TYPE).addToGoggleTooltip(tooltip, isPlayerSneaking)
         return true
     }
 
     override fun destroy() {
         super.destroy()
-        LinkedCountManager.removeLinkedBlock(CelBlocks.ENDER_TANK.key, this)
+        LinkCountManager.unregisterEntity(CelBlocks.ENDER_TANK.key, this)
     }
 
     override fun remove() {
         super.remove()
-        LinkedCountManager.removeLinkedBlock(CelBlocks.ENDER_TANK.key, this)
+        LinkCountManager.unregisterEntity(CelBlocks.ENDER_TANK.key, this)
     }
 
     override fun onChunkUnloaded() {
         super.onChunkUnloaded()
-        LinkedCountManager.removeLinkedBlock(CelBlocks.ENDER_TANK.key, this)
+        LinkCountManager.unregisterEntity(CelBlocks.ENDER_TANK.key, this)
     }
 
     override fun sendData() {

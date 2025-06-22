@@ -1,8 +1,11 @@
 package io.github.cotrin8672.cel.content.storage
 
 import io.github.cotrin8672.cel.content.block.tank.EnderTankBlockEntity
+import io.github.cotrin8672.cel.model.StorageFrequency
 import io.github.cotrin8672.cel.network.CelNetworking
-import io.github.cotrin8672.cel.network.SyncSharedStoragePacket
+import io.github.cotrin8672.cel.network.UpdateSharedTankPacket
+import io.github.cotrin8672.cel.registry.CelBlocks
+import io.github.cotrin8672.cel.util.LinkCountManager
 import io.github.cotrin8672.cel.util.SharedStorageHandler
 import net.createmod.catnip.animation.LerpedFloat
 import net.minecraft.nbt.CompoundTag
@@ -11,7 +14,11 @@ import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.templates.FluidTank
 import net.minecraftforge.network.PacketDistributor
 
-class SharedFluidTank(capacity: Int, private val handler: SharedStorageHandler?) : FluidTank(capacity) {
+class SharedFluidTank(
+    capacity: Int,
+    private val handler: SharedStorageHandler?,
+    private val storageFrequency: StorageFrequency,
+) : FluidTank(capacity) {
     var fluidLevel: LerpedFloat? = null
     var forceFluidLevelUpdate = true
 
@@ -55,20 +62,18 @@ class SharedFluidTank(capacity: Int, private val handler: SharedStorageHandler?)
         val reversed = attributes.isLighterThanAir
         val maxY = ((getFillState() * 1) + 1).toInt()
 
-        val anyBe = EnderTankBlockEntity.getLoadingBlockEntities().firstOrNull()
+        val anyBe = LinkCountManager.getLoadingBlockEntities(CelBlocks.ENDER_TANK.key).firstOrNull()
         val level = anyBe?.level
-        if (level is ServerLevel) {
-            val nbt = SharedStorageHandler.instance?.save(CompoundTag()) ?: return
-            for (player in level.players()) {
-                CelNetworking.CHANNEL.send(
-                    PacketDistributor.PLAYER.with { player },
-                    SyncSharedStoragePacket(nbt)
-                )
-            }
+        if (level is ServerLevel && level.server.isDedicatedServer) {
+            CelNetworking.CHANNEL.send(
+                PacketDistributor.ALL.noArg(),
+                UpdateSharedTankPacket(storageFrequency, getFluid())
+            )
         }
 
-        for (be in EnderTankBlockEntity.getLoadingBlockEntities()) {
+        for (be in LinkCountManager.getLoadingBlockEntities(CelBlocks.ENDER_TANK.key)) {
             if (!be.hasLevel()) continue
+            if (be !is EnderTankBlockEntity) continue
 
             val isBright = if (reversed) (1 <= maxY) else (0 < maxY)
             val actualLuminosity = if (isBright) luminosity else if (luminosity > 0) 1 else 0

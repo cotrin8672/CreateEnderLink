@@ -2,6 +2,7 @@ package io.github.cotrin8672.cel.util
 
 import io.github.cotrin8672.cel.content.storage.SharedFluidTank
 import io.github.cotrin8672.cel.content.storage.SharedItemStackHandler
+import io.github.cotrin8672.cel.model.StorageFrequency
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.Tag
@@ -28,7 +29,7 @@ class SharedStorageHandler : SavedData() {
 
     fun getOrCreateSharedFluidStorage(frequency: StorageFrequency): SharedFluidTank {
         return sharedFluidStorage.computeIfAbsent(frequency) {
-            SharedFluidTank(10000, this)
+            SharedFluidTank(10000, this, frequency)
         }
     }
 
@@ -99,13 +100,13 @@ class SharedStorageHandler : SavedData() {
                 val frequencyItemTag = item.getCompound("Frequency")
                 val inventoryTag = item.getCompound("Tank")
                 val frequency = StorageFrequency.of(ItemStack.of(frequencyItemTag))
-                val fluidTank = SharedFluidTank(10000, this).apply {
+                val fluidTank = SharedFluidTank(10000, this, frequency).apply {
                     readFromNBT(inventoryTag)
                 }
                 sharedFluidStorage[frequency] = fluidTank
             } else if (item.contains("StorageFrequency", Tag.TAG_COMPOUND.toInt())) {
                 val storageFrequency = StorageFrequency.parseOptional(item.getCompound("StorageFrequency"))
-                val fluidTank = SharedFluidTank(10000, this).apply {
+                val fluidTank = SharedFluidTank(10000, this, storageFrequency).apply {
                     readFromNBT(item.getCompound("Tank"))
                 }
 

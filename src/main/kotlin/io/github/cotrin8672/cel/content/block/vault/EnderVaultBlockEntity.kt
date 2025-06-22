@@ -6,7 +6,7 @@ import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour
 import com.simibubi.create.foundation.blockEntity.behaviour.CenteredSideValueBoxTransform
 import io.github.cotrin8672.cel.content.SharedStorageBehaviour
 import io.github.cotrin8672.cel.registry.CelBlocks
-import io.github.cotrin8672.cel.util.LinkedCountManager
+import io.github.cotrin8672.cel.util.LinkCountManager
 import io.github.cotrin8672.cel.util.SharedStorageHandler
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -25,8 +25,10 @@ class EnderVaultBlockEntity(
     pos: BlockPos,
     state: BlockState,
 ) : SmartBlockEntity(type, pos, state), IHaveGoggleInformation {
-    init {
-        LinkedCountManager.addLinkedBlock(CelBlocks.ENDER_VAULT.key, this)
+    override fun onLoad() {
+        super.onLoad()
+        if (level is ServerLevel)
+            LinkCountManager.registerEntity(CelBlocks.ENDER_VAULT.key, this)
     }
 
     private fun getInventory(): IItemHandler? {
@@ -56,27 +58,23 @@ class EnderVaultBlockEntity(
         super.addToGoggleTooltip(tooltip, isPlayerSneaking)
 
         val behaviour = getBehaviour(SharedStorageBehaviour.TYPE)
-        behaviour.addToGoggleTooltip(
-            tooltip,
-            isPlayerSneaking,
-            LinkedCountManager.getLinkedCount(CelBlocks.ENDER_VAULT.key, behaviour.getFrequency())
-        )
+        behaviour.addToGoggleTooltip(tooltip, isPlayerSneaking)
 
         return true
     }
 
     override fun destroy() {
         super.destroy()
-        LinkedCountManager.removeLinkedBlock(CelBlocks.ENDER_VAULT.key, this)
+        LinkCountManager.unregisterEntity(CelBlocks.ENDER_VAULT.key, this)
     }
 
     override fun remove() {
         super.remove()
-        LinkedCountManager.removeLinkedBlock(CelBlocks.ENDER_VAULT.key, this)
+        LinkCountManager.unregisterEntity(CelBlocks.ENDER_VAULT.key, this)
     }
 
     override fun onChunkUnloaded() {
         super.onChunkUnloaded()
-        LinkedCountManager.removeLinkedBlock(CelBlocks.ENDER_VAULT.key, this)
+        LinkCountManager.unregisterEntity(CelBlocks.ENDER_VAULT.key, this)
     }
 }

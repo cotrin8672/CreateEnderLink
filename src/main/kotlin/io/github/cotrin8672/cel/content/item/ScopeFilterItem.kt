@@ -1,9 +1,10 @@
 package io.github.cotrin8672.cel.content.item
 
 import com.simibubi.create.AllKeys
+import io.github.cotrin8672.cel.model.ProfileKey
+import io.github.cotrin8672.cel.model.StorageFrequency
 import io.github.cotrin8672.cel.registry.CelItems
 import io.github.cotrin8672.cel.util.CelLang
-import io.github.cotrin8672.cel.util.StorageFrequency
 import io.github.cotrin8672.cel.util.storageFrequency
 import net.minecraft.ChatFormatting
 import net.minecraft.network.FriendlyByteBuf
@@ -33,7 +34,7 @@ class ScopeFilterItem(properties: Properties) : Item(properties), MenuProvider {
         val heldItem = player.getItemInHand(hand)
         val oldStorageFrequency = heldItem.storageFrequency
         val storageFrequency =
-            StorageFrequency.of(oldStorageFrequency.stack, player.gameProfile)
+            StorageFrequency.of(oldStorageFrequency.stack, ProfileKey(player.uuid, player.name.string))
         heldItem.storageFrequency = storageFrequency
 
         if (!player.isShiftKeyDown && hand == InteractionHand.MAIN_HAND) {
@@ -55,7 +56,7 @@ class ScopeFilterItem(properties: Properties) : Item(properties), MenuProvider {
         if (AllKeys.shiftDown()) return
 
         val storageFrequency = stack.storageFrequency
-        val frequencyOwner = storageFrequency.gameProfile
+        val frequencyOwner = storageFrequency.profileKey
         val frequencyOwnerTip = CelLang.translate("gui.goggles.frequency_scope")
             .add(
                 if (frequencyOwner == StorageFrequency.GLOBAL_PROFILE)

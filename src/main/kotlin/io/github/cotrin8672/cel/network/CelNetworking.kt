@@ -8,6 +8,7 @@ import net.minecraftforge.network.simple.SimpleChannel
 object CelNetworking {
     private var syncSharedStoragePacketID = 0
     private var linkedBlockCountPacketID = 0
+    private var updateSharedTankPacketID = 0
 
     val CHANNEL: SimpleChannel = NetworkRegistry.newSimpleChannel(
         CreateEnderLink.asResource("sync_shared_storage"),
@@ -28,13 +29,23 @@ object CelNetworking {
             .add()
 
         CHANNEL.messageBuilder(
-            FullLinkedCountPacket::class.java,
+            SyncFullLinkPacket::class.java,
             linkedBlockCountPacketID++,
             NetworkDirection.PLAY_TO_CLIENT
         )
-            .encoder(FullLinkedCountPacket::encode)
-            .decoder(FullLinkedCountPacket::decode)
-            .consumerNetworkThread(FullLinkedCountPacket::handleOnClient)
+            .encoder(SyncFullLinkPacket::encode)
+            .decoder(SyncFullLinkPacket::decode)
+            .consumerNetworkThread(SyncFullLinkPacket::handleOnClient)
+            .add()
+
+        CHANNEL.messageBuilder(
+            UpdateSharedTankPacket::class.java,
+            updateSharedTankPacketID++,
+            NetworkDirection.PLAY_TO_CLIENT
+        )
+            .encoder(UpdateSharedTankPacket::encode)
+            .decoder(UpdateSharedTankPacket::decode)
+            .consumerNetworkThread(UpdateSharedTankPacket::handleOnClient)
             .add()
     }
 }

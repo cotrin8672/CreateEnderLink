@@ -1,11 +1,15 @@
 package io.github.cotrin8672.cel.content.block
 
+import io.github.cotrin8672.cel.network.CelNetworking
+import io.github.cotrin8672.cel.network.SyncFullLinkPacket
 import io.github.cotrin8672.cel.registry.CelItems
 import io.github.cotrin8672.cel.util.CelLang
+import io.github.cotrin8672.cel.util.LinkCountManager.linkedList
 import io.github.cotrin8672.cel.util.consumeItem
 import io.github.cotrin8672.cel.util.storageFrequency
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.ItemStack
@@ -13,6 +17,7 @@ import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.item.context.BlockPlaceContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
+import net.minecraftforge.network.PacketDistributor
 
 class SharedStorageBlockItem(block: Block, properties: Properties) : BlockItem(block, properties) {
     override fun isFoil(stack: ItemStack): Boolean {
@@ -25,7 +30,7 @@ class SharedStorageBlockItem(block: Block, properties: Properties) : BlockItem(b
         val heldItem = context.itemInHand
         val storageFrequency = heldItem.storageFrequency
 
-        return if (player == null) {
+        val result = if (player == null) {
             if (storageFrequency.isGlobalScope) super.place(context)
             else InteractionResult.FAIL
         } else {
@@ -47,6 +52,15 @@ class SharedStorageBlockItem(block: Block, properties: Properties) : BlockItem(b
                 }
             }
         }
+
+        if (context.level is ServerLevel) {
+            CelNetworking.CHANNEL.send(
+                PacketDistributor.ALL.noArg(),
+                SyncFullLinkPacket(linkedList)
+            )
+        }
+
+        return result
     }
 
     override fun appendHoverText(stack: ItemStack, level: Level?, tooltip: MutableList<Component?>, flag: TooltipFlag) {

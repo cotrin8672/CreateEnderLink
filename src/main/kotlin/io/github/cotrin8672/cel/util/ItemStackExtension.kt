@@ -1,5 +1,6 @@
 package io.github.cotrin8672.cel.util
 
+import io.github.cotrin8672.cel.model.StorageFrequency
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.item.ItemStack
 
@@ -11,7 +12,6 @@ var ItemStack.storageFrequency: StorageFrequency
         val storageFrequencyTag = tag.getCompound("StorageFrequency")
         return StorageFrequency.parseOptional(storageFrequencyTag)
     }
-
     set(value) {
         tag ?: run { tag = CompoundTag() }
         tag?.put("StorageFrequency", value.saveOptional())

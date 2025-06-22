@@ -9,8 +9,8 @@ import com.simibubi.create.foundation.blockEntity.behaviour.ValueBox.ItemValueBo
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxRenderer
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform.Sided
 import io.github.cotrin8672.cel.content.SharedStorageBehaviour
+import io.github.cotrin8672.cel.model.StorageFrequency
 import io.github.cotrin8672.cel.registry.CelItems
-import io.github.cotrin8672.cel.util.StorageFrequency
 import io.github.cotrin8672.cel.util.use
 import net.createmod.catnip.data.Iterate
 import net.createmod.catnip.data.Pair

@@ -3,10 +3,10 @@ package io.github.cotrin8672.cel.content.block.vault
 import com.simibubi.create.content.equipment.wrench.IWrenchable
 import com.simibubi.create.foundation.block.IBE
 import io.github.cotrin8672.cel.content.SharedStorageBehaviour
+import io.github.cotrin8672.cel.model.StorageFrequency
 import io.github.cotrin8672.cel.registry.CelBlockEntityTypes
 import io.github.cotrin8672.cel.registry.CelBlocks
 import io.github.cotrin8672.cel.util.CelLang
-import io.github.cotrin8672.cel.util.StorageFrequency
 import io.github.cotrin8672.cel.util.storageFrequency
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
