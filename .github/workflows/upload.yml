@@ -6,7 +6,7 @@ on:
 
 jobs:
   upload:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       CURSE_FORGE_API_KEY: ${{ secrets.CURSE_FORGE_API_KEY }}
       MODRINTH_API_KEY: ${{ secrets.MODRINTH_API_KEY }}
