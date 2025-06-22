@@ -6,9 +6,9 @@ import net.minecraftforge.network.NetworkRegistry
 import net.minecraftforge.network.simple.SimpleChannel
 
 object CelNetworking {
-    private var syncSharedStoragePacketID = 0
-    private var linkedBlockCountPacketID = 0
-    private var updateSharedTankPacketID = 0
+    private var packetId = 0
+
+    private fun nextId() = packetId++
 
     val CHANNEL: SimpleChannel = NetworkRegistry.newSimpleChannel(
         CreateEnderLink.asResource("sync_shared_storage"),
@@ -20,7 +20,7 @@ object CelNetworking {
     fun registerPacket() {
         CHANNEL.messageBuilder(
             SyncSharedStoragePacket::class.java,
-            syncSharedStoragePacketID++,
+            nextId(),
             NetworkDirection.PLAY_TO_CLIENT
         )
             .encoder(SyncSharedStoragePacket::encode)
@@ -30,7 +30,7 @@ object CelNetworking {
 
         CHANNEL.messageBuilder(
             SyncFullLinkPacket::class.java,
-            linkedBlockCountPacketID++,
+            nextId(),
             NetworkDirection.PLAY_TO_CLIENT
         )
             .encoder(SyncFullLinkPacket::encode)
@@ -40,7 +40,7 @@ object CelNetworking {
 
         CHANNEL.messageBuilder(
             UpdateSharedTankPacket::class.java,
-            updateSharedTankPacketID++,
+            nextId(),
             NetworkDirection.PLAY_TO_CLIENT
         )
             .encoder(UpdateSharedTankPacket::encode)
