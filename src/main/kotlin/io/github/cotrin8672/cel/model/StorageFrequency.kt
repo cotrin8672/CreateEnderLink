@@ -1,12 +1,9 @@
-package io.github.cotrin8672.cel.util
+package io.github.cotrin8672.cel.model
 
-import com.mojang.authlib.GameProfile
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.core.UUIDUtil
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.nbt.Tag
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import java.util.*
@@ -15,23 +12,23 @@ import java.util.concurrent.ConcurrentHashMap
 class StorageFrequency
 private constructor(
     val stack: ItemStack,
-    val gameProfile: GameProfile = GLOBAL_PROFILE,
+    val profileKey: ProfileKey = GLOBAL_PROFILE,
 ) {
     data class FrequencyKey(
         val item: Item,
         val color: Int,
-        val gameProfile: GameProfile = GLOBAL_PROFILE,
+        val profileKey: ProfileKey = GLOBAL_PROFILE,
     )
 
     fun copy(
         stack: ItemStack = this.stack,
-        gameProfile: GameProfile = this.gameProfile,
+        profileKey: ProfileKey = this.profileKey,
     ): StorageFrequency {
-        return of(stack, gameProfile)
+        return of(stack, profileKey)
     }
 
     val isGlobalScope: Boolean
-        get() = gameProfile == GLOBAL_PROFILE
+        get() = profileKey == GLOBAL_PROFILE
 
     val isPersonalScope: Boolean
         get() = !isGlobalScope
@@ -49,21 +46,13 @@ private constructor(
 
     companion object {
         val GLOBAL_PROFILE by lazy {
-            GameProfile(UUID.fromString("83695eeb-3b18-40d8-a790-d16d749e1413"), "Global")
-        }
-
-        // Codecs
-        private val GAME_PROFILE_CODEC = RecordCodecBuilder.mapCodec { builder ->
-            builder.group(
-                UUIDUtil.CODEC.fieldOf("id").forGetter(GameProfile::getId),
-                Codec.STRING.fieldOf("name").forGetter(GameProfile::getName)
-            ).apply(builder, ::GameProfile)
+            ProfileKey(UUID.fromString("83695eeb-3b18-40d8-a790-d16d749e1413"), "Global")
         }
 
         private val MAP_CODEC: MapCodec<StorageFrequency> = RecordCodecBuilder.mapCodec { builder ->
             builder.group(
                 ItemStack.CODEC.fieldOf("frequency_item").forGetter { it.stack },
-                GAME_PROFILE_CODEC.fieldOf("game_profile").forGetter { it.gameProfile }
+                ProfileKey.CODEC.fieldOf("game_profile").forGetter { it.profileKey }
             ).apply(builder, ::StorageFrequency)
         }
 
@@ -73,12 +62,12 @@ private constructor(
 
         private val storageFrequencies = ConcurrentHashMap<FrequencyKey, StorageFrequency>()
 
-        fun of(stack: ItemStack, gameProfile: GameProfile = GLOBAL_PROFILE): StorageFrequency {
+        fun of(stack: ItemStack, profileKey: ProfileKey = GLOBAL_PROFILE): StorageFrequency {
             val displayTag = stack.getTagElement("display")
             val color = if (displayTag != null && displayTag.contains("color")) displayTag.getInt("color") else -1
 
-            return storageFrequencies.computeIfAbsent(FrequencyKey(stack.item, color, gameProfile)) {
-                StorageFrequency(stack.item.defaultInstance, gameProfile)
+            return storageFrequencies.computeIfAbsent(FrequencyKey(stack.item, color, profileKey)) {
+                StorageFrequency(stack.item.defaultInstance, profileKey)
             }
         }
 
@@ -87,36 +76,25 @@ private constructor(
                 ItemStack.of(tag.getCompound("ItemStack"))
             else ItemStack.EMPTY
             val gameProfile = if (tag.contains("GameProfile"))
-                deserializeGameProfile(tag.getCompound("GameProfile"))
+                ProfileKey.parseOptional(tag.getCompound("GameProfile"))
             else GLOBAL_PROFILE
             return of(stack, gameProfile)
         }
-
-        private fun serializeGameProfile(gameProfile: GameProfile): CompoundTag {
-            return CompoundTag().apply {
-                putUUID("UUID", gameProfile.id)
-                putString("Name", gameProfile.name)
-            }
-        }
-
-        private fun deserializeGameProfile(tag: CompoundTag): GameProfile {
-            return GameProfile(tag.getUUID("UUID"), tag.getString("Name"))
-        }
     }
 
-    fun saveOptional(): Tag {
+    fun saveOptional(): CompoundTag {
         return CompoundTag().apply {
             put("ItemStack", stack.serializeNBT())
-            put("GameProfile", serializeGameProfile(gameProfile))
+            put("GameProfile", profileKey.saveOptional())
         }
     }
 
     override fun equals(other: Any?): Boolean {
         if (other !is StorageFrequency) return false
-        return stack.item == other.stack.item && gameProfile == other.gameProfile && color == other.color
+        return stack.item == other.stack.item && profileKey == other.profileKey && color == other.color
     }
 
     override fun hashCode(): Int {
-        return (31 * stack.item.hashCode() + gameProfile.hashCode()) xor color
+        return (31 * stack.item.hashCode() + profileKey.hashCode()) xor color
     }
 }

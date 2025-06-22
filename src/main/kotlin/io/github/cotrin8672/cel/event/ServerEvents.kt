@@ -2,7 +2,9 @@ package io.github.cotrin8672.cel.event
 
 import io.github.cotrin8672.cel.CreateEnderLink
 import io.github.cotrin8672.cel.network.CelNetworking
+import io.github.cotrin8672.cel.network.SyncFullLinkPacket
 import io.github.cotrin8672.cel.network.SyncSharedStoragePacket
+import io.github.cotrin8672.cel.util.LinkCountManager.linkedList
 import io.github.cotrin8672.cel.util.SharedStorageHandler
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerPlayer
@@ -20,6 +22,11 @@ object ServerEvents {
         CelNetworking.CHANNEL.send(
             PacketDistributor.PLAYER.with { event.entity as ServerPlayer },
             SyncSharedStoragePacket(nbt)
+        )
+
+        CelNetworking.CHANNEL.send(
+            PacketDistributor.PLAYER.with { event.entity as ServerPlayer },
+            SyncFullLinkPacket(linkedList)
         )
     }
 }

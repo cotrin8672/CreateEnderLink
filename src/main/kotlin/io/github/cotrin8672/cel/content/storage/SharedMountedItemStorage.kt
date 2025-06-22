@@ -3,9 +3,9 @@ package io.github.cotrin8672.cel.content.storage
 import com.mojang.serialization.Codec
 import com.simibubi.create.api.contraption.storage.item.MountedItemStorage
 import com.simibubi.create.content.contraptions.Contraption
+import io.github.cotrin8672.cel.model.StorageFrequency
 import io.github.cotrin8672.cel.registry.CelMountedStorageTypes
 import io.github.cotrin8672.cel.util.SharedStorageHandler
-import io.github.cotrin8672.cel.util.StorageFrequency
 import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.item.ItemStack

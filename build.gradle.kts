@@ -60,6 +60,7 @@ legacyForge {
 
         configureEach {
             systemProperty("forge.logging.markers", "REGISTRIES")
+            gameDirectory.set(file("run-$name"))
             logLevel = org.slf4j.event.Level.DEBUG
         }
     }
@@ -100,7 +101,7 @@ repositories {
 
 dependencies {
     implementation(libs.kotlinforforge)
-    modImplementation("com.simibubi.create:create-1.20.1:6.0.4-79:slim") {
+    modImplementation("com.simibubi.create:create-1.20.1:6.0.6-150:slim") {
         isTransitive = false
     }
     modImplementation(libs.ponder)
@@ -111,8 +112,6 @@ dependencies {
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1")!!)
     implementation(libs.mixin.forge)
 
-//    modCompileOnly("top.theillusivec4.curios:curios-forge:5.14.1+1.20.1:api")
-//    modRuntimeOnly("top.theillusivec4.curios:curios-forge:5.14.1+1.20.1")
     modImplementation(libs.jei)
 }
 
@@ -152,7 +151,7 @@ val generateModMetadata = tasks.register<ProcessResources>("generateModMetadata"
         "forgeVersion" to libs.versions.forge.get(),
         "forgeVersionRange" to "[47.1.3,)",
         "loaderVersionRange" to "[${libs.versions.kotlinforforge.get()},)",
-        "createVersionRange" to "[6.0.0,)",
+        "createVersionRange" to "[6.0.6,)",
         "modId" to modId,
         "modName" to modName,
         "modLicense" to modLicense,
