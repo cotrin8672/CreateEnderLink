@@ -3,6 +3,7 @@ package io.github.cotrin8672.cel.util
 import io.github.cotrin8672.cel.content.storage.SharedFluidTank
 import io.github.cotrin8672.cel.content.storage.SharedItemStackHandler
 import io.github.cotrin8672.cel.model.StorageFrequency
+import io.github.cotrin8672.cel.network.UpdateSharedTankPacket
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.Tag
@@ -30,6 +31,12 @@ class SharedStorageHandler : SavedData() {
     fun getOrCreateSharedFluidStorage(frequency: StorageFrequency): SharedFluidTank {
         return sharedFluidStorage.computeIfAbsent(frequency) {
             SharedFluidTank(10000, this, frequency)
+        }
+    }
+
+    fun updateTankContentFromPacket(packet: UpdateSharedTankPacket) {
+        sharedFluidStorage[packet.storageFrequency]?.apply {
+            this.fluid = packet.fluidStack
         }
     }
 

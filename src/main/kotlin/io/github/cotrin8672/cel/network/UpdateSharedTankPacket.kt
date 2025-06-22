@@ -1,6 +1,7 @@
 package io.github.cotrin8672.cel.network
 
 import io.github.cotrin8672.cel.model.StorageFrequency
+import io.github.cotrin8672.cel.util.SharedStorageHandler
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraftforge.fluids.FluidStack
@@ -29,6 +30,7 @@ class UpdateSharedTankPacket(val storageFrequency: StorageFrequency, val fluidSt
 
     fun handleOnClient(ctx: Supplier<NetworkEvent.Context>) {
         ctx.get().enqueueWork {
+            SharedStorageHandler.instance?.updateTankContentFromPacket(this)
         }
 
         ctx.get().packetHandled = true

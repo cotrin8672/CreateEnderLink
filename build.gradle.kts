@@ -112,8 +112,6 @@ dependencies {
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1")!!)
     implementation(libs.mixin.forge)
 
-//    modCompileOnly("top.theillusivec4.curios:curios-forge:5.14.1+1.20.1:api")
-//    modRuntimeOnly("top.theillusivec4.curios:curios-forge:5.14.1+1.20.1")
     modImplementation(libs.jei)
 }
 
