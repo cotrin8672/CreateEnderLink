@@ -12,7 +12,7 @@ object CelDatagen {
         val packOutput = generator.packOutput
         generator.addProvider(
             true,
-            REGISTRATE.setDataProvider(RegistrateDataProvider(REGISTRATE, MOD_ID, event))
+            RegistrateDataProvider(REGISTRATE, MOD_ID, event)
         )
         generator.addProvider(true, CelRecipeProvider(packOutput, event.lookupProvider))
     }
