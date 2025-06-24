@@ -108,7 +108,7 @@ dependencies {
 
     runtimeOnly("top.theillusivec4.curios:curios-neoforge:9.2.2+1.21.1")
     compileOnly("top.theillusivec4.curios:curios-neoforge:9.2.2+1.21.1:api")
-    runtimeOnly(libs.jei)
+    implementation(libs.jei)
 }
 
 publisher {
